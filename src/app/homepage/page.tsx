@@ -1,6 +1,8 @@
 import Header from "./header"
 import Menu from "./menu"
 import Main from "./main"
+import Footer from "./footer"
+import ThongBao from "./thongbao"
 export default function HomePage() {
     return (
         <>
@@ -9,6 +11,8 @@ export default function HomePage() {
                 <Header />  
                 <Menu />
                 <Main />
+                <ThongBao />
+                <Footer />
             </div>
         </>
     )

@@ -22,26 +22,24 @@ function Main() {
                     fill={true} 
                 />
             </div>
-            <div className='flex pt-10 pb-10 justify-center border-b-[#5895a9] border-b-2 ml-[50px] mr-[50px] lg:ml-[250px] lg:mr-[250px] space-x-6' >
-                {
-                    script.map((item)=>(
-                        <div className='w-80 bg-[#dad8d9] p-5'> 
-                            <div className='flex justify-center p-2'>
-                                <Image 
-                                    src={item.icon}
-                                    width={100}
-                                    height={100}
-                                    alt='icon1'
-                                />  
+            <div className='flex justify-center mt-10'>
+                <div className='flex w-[1000px] pb-10 border-b-[#5895a9] border-b-[3px] space-x-6' >
+                    {
+                        script.map((item)=>(
+                            <div className='w-80 bg-[#dad8d9] p-5'> 
+                                <div className='flex justify-center p-2'>
+                                    <Image 
+                                        src={item.icon}
+                                        width={100}
+                                        height={100}
+                                        alt='icon'
+                                    />  
+                                </div>
+                                <p className='text-black font-bold text-center'>{item.str}</p>
                             </div>
-                            <p className='text-black font-bold text-center'>{item.str}</p>
-                        </div>
-                    ))
-                }
-            </div>
-            
-            <div className=''>
-                THONG BAO
+                        ))
+                    }
+                </div>
             </div>
         </div>
       );
