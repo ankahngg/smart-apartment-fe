@@ -23,7 +23,7 @@ function Main() {
                 />
             </div>
             <div className='flex justify-center mt-10'>
-                <div className='flex w-[1000px] pb-10 border-b-[#5895a9] border-b-[3px] space-x-6' >
+                <div className='flex w-[500px] lg:w-[1000px] pb-10 border-b-[#5895a9] border-b-[3px] space-x-6 '>
                     {
                         script.map((item)=>(
                             <div className='w-80 bg-[#dad8d9] p-5'> 
