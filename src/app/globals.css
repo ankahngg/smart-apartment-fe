@@ -7,7 +7,7 @@
   --foreground: #171717;
 }
 
-p {
+p, div {
   color: #171717;
 } 
 

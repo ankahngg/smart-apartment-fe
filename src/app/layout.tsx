@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Header from "./header";
+import Menu from "./menu";
+import Footer from "./footer";
 import localFont from "next/font/local";
 import "./globals.css";
 
@@ -28,7 +31,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Header />
+        <Menu />
         {children}
+        <Footer />
       </body>
     </html>
   );
