@@ -12,7 +12,7 @@ export default function Menu(){
         },
         {
             name : 'Dịch Vụ',
-            src : '/service',
+            src : '/service/feeservice',
         },
         {
             name : 'Tra Cứu',
