@@ -15,7 +15,7 @@ function Table() {
             phidv : 100000,
             phigx : 1000000,
             phish : 2000000,
-            state : 'da dong',
+            state : 'Đã đóng',
             ngaydong : '20-10-2023'
         },
         {
@@ -28,13 +28,13 @@ function Table() {
             phidv : 100000,
             phigx : 1000000,
             phish : 2000000,
-            state : 'da dong',
+            state : 'Chưa đóng',
             ngaydong : '20-10-2023'
         }
     ]
     const dispatch = useDispatch();
     return (
-    <div className="w-full p-4 border-black border-2">
+    <div className="w-full p-4 border-black border-2 h-[700px]">
         <div className="flex justify-between">
             <div>
                 <div className="text-xl font-bold">Danh sách hóa đơn</div>
@@ -71,7 +71,7 @@ function Table() {
             <table className="w-full">
                 <tr className="border-b-2 border-black mb-2">
                         <th className="p-2 text-center w-fit">STT</th>
-                        <th className="p-2 text-center w-fit">Mã hóa đơn</th>
+                        <th className="p-2 text-center w-fit">MHD</th>
                         <th className="p-2 text-center w-fit">Mã căn hộ</th>
                         <th className="p-2 text-center w-[200px]">Họ tên chủ hộ</th>
                         <th className="p-2 text-center">Đợt thu</th>
@@ -81,7 +81,7 @@ function Table() {
                         <th className="p-2 text-center">Phí sinh hoạt</th>
                         <th className="p-2 text-center">Trạng thái</th>
                         <th className="p-2 text-center">Ngày đóng</th>
-                        <th className="p-2 text-center">Xóa</th>
+                        <th className="p-2 text-center">Hành động</th>
                 </tr>
                 {
                     data.map((val)=> {
@@ -113,10 +113,17 @@ function Table() {
                                         (<div></div>)
                                     }
                                 </td>
-                                <td className="text-center">{val.state}</td>
+                                {
+                                    val.state == "Đã đóng" ?
+                                    <td className="text-center text-green-500 font-bold">{val.state}</td>
+                                    :
+                                    <td className="text-center text-red-500 font-bold">{val.state}</td>
+                                }
                                 <td className="text-center">{val.ngaydong}</td>
                                 <td className="text-center">
-                                    <button className="hover:bg-red-500 pl-2 pr-2 rounded-xl">Xóa</button>
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
+                                    onClick={()=>dispatch(globalSlice.actions.chinhsua_fee(true))}
+                                    >Chỉnh sửa</button>
                                 </td>
                             </tr>
                         )

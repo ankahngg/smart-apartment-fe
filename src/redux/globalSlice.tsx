@@ -3,12 +3,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface StateType {
     dongtien : boolean,
-    themchiendich : boolean
+    themchiendich : boolean,
+    chinhsua_fee : boolean,
 }
 
 const initState : StateType = {
     dongtien : false,
     themchiendich : false,
+    chinhsua_fee : false,
 }
 
 export default createSlice({
@@ -21,5 +23,9 @@ export default createSlice({
         themchiendich : (state,action : PayloadAction<boolean>) => {
             state.themchiendich = action.payload;
         },
+        chinhsua_fee : (state,action : PayloadAction<boolean>) => {
+            state.chinhsua_fee = action.payload;
+        },
+        
     }
 })

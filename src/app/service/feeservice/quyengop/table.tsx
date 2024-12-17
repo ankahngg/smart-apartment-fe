@@ -12,6 +12,18 @@ function Table() {
             sotien : 100000,
             ngaydong : "20-11-2024"
 
+        },
+        {
+            stt:1,
+            mqg:"qg101",
+            tenqg:"Quy tre em hiem ngheo vuot kho",
+            tgbd:"20-10-2024",
+            tgkt:"20-10-2025",
+            mch:"12.01",
+            hoten:"Nguyen Phuc An Khang",
+            sotien : 100000,
+            ngaydong : "20-11-2024"
+
         }
     ]
 
@@ -38,13 +50,14 @@ function Table() {
                 <tr className="border-b-2 border-black mb-2 align-top">
                         <th className="p-2 text-center w-fit">STT</th>
                         <th className="p-2 text-center w-fit">MQG</th>
-                        <th className="p-2 text-center w-[200px]">Tên quyên góp</th>
-                        <th className="p-2 text-center">Thời gian bắt đầu</th>
+                        <th className="p-2 text-center w-[180px]">Tên quyên góp</th>
+                        <th className="p-2 text-center ">Thời gian bắt đầu</th>
                         <th className="p-2 text-center">Thời gian kết thúc</th>
                         <th className="p-2 text-center w-fit">Mã căn hộ</th>
-                        <th className="p-2 text-center w-[200px]">Họ tên chủ hộ</th>
+                        <th className="p-2 text-center w-[180px]">Họ tên chủ hộ</th>
                         <th className="p-2 text-center">Số tiền</th>
                         <th className="p-2 text-center">Ngày đóng</th>
+                        <th className="p-2 text-center">Hành động</th>
                 </tr>
                 {
                     data.map((val)=> {
@@ -59,6 +72,9 @@ function Table() {
                                 <td className="text-center">{val.hoten}</td>
                                 <td className="text-center">{(val.sotien).toLocaleString('de-DE')}</td>
                                 <td className="text-center">{val.ngaydong}</td>
+                                <td className="text-center">
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-1 pr-1 rounded-xl text-white">Chỉnh sửa</button>
+                                </td>
                             </tr>
                         )
                     })

@@ -3,7 +3,7 @@ import { useAppDispatch } from "../../../../redux/hooks";
 
 function Qgfilter() {
     const dispatch = useAppDispatch()
-    const qg_data:{maqg:string,tenqg:string,tongtien:int,tgbd:string,tgkt:string}[] = [
+    const qg_data:{maqg:string,tenqg:string,tongtien:number,tgbd:string,tgkt:string}[] = [
         {
             maqg : "qg00",
             tenqg : "quy tre em hiem ngheo 2024 - 2025",
@@ -51,13 +51,12 @@ function Qgfilter() {
                     {
                         qg_data.map((val) => {
                             return (
-                            <tr className="text-center text-sm align-top">
+                            <tr className="text-center text-sm align-top hover:bg-[#68d3cc1c]">
                                 <td>{val.maqg}</td>
                                 <td>{val.tenqg}</td>
                                 <td>{val.tongtien}</td>
                                 <td>{val.tgbd}</td>
                                 <td>{val.tgkt}</td>
-
                             </tr>
                         )})
                     }
