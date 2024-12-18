@@ -4,7 +4,7 @@ function Filter() {
     const floor_filter:string[] = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']
 
     return (
-        <div className="border-2 p-2">
+        <div className="border-2 p-2 border-black h-full">
             <div className="p-2 italic text-xl ">Bộ lọc</div>
             <div className="flex mb-2">
 

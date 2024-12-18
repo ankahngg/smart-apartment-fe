@@ -1,4 +1,4 @@
-import Filter from "./filter";
+import Filter from "./filter/filter";
 import Table from "./table";
 import Themchiendich from "./themchiendich";
 import { useAppSelector } from "@/redux/hooks";

@@ -1,3 +1,5 @@
+import Dongtien from "./dongtien";
+
 function Table() {
 
     const data:{stt:number,mqg:string,tenqg:string,tgbd:string, tgkt:string,mch:string,hoten:string,sotien:number,ngaydong:string}[] = [
@@ -26,10 +28,8 @@ function Table() {
 
         }
     ]
-
-
     return (
-    <div className="p-2 border-2">
+    <div className="p-2 border-2 h-[800px] border-black">
         <div className="flex justify-between">
             <div>
                 <div className="text-xl font-bold">Danh sách quyên góp</div>
@@ -44,6 +44,10 @@ function Table() {
                     </div>
                 </div>
             </div>
+            <div className="mr-5">
+                    <button className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
+                    >QUYÊN GÓP</button>
+                </div>
         </div>
         <div className="mt-2">
             <table className="w-full">
@@ -73,7 +77,7 @@ function Table() {
                                 <td className="text-center">{(val.sotien).toLocaleString('de-DE')}</td>
                                 <td className="text-center">{val.ngaydong}</td>
                                 <td className="text-center">
-                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-1 pr-1 rounded-xl text-white">Chỉnh sửa</button>
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-1 pr-1 rounded-xl text-white">Xóa</button>
                                 </td>
                             </tr>
                         )

@@ -1,5 +1,5 @@
 import globalSlice from "@/redux/globalSlice";
-import { useAppDispatch } from "../../../../redux/hooks";
+import { useAppDispatch } from "@/redux/hooks"
 
 function Qgfilter() {
     const dispatch = useAppDispatch()
@@ -34,10 +34,14 @@ function Qgfilter() {
                     <input className="p-2 pb-1 border-2 border-black rounded-xl w-full" type="text" placeholder="TÌM KIẾM"/>
                 </div>
             </div>
-            <div>
+            <div className="flex justify-between items-center">
                 <button className="border-2 border-black rounded-xl p-1 bg-[#1e83a5] hover:bg-[#176b87] text-white mt-2"
                 onClick={()=>dispatch(globalSlice.actions.themchiendich(true))}
                 >THÊM CHIẾN DỊCH</button>
+                <div>
+                    <button className="italic mr-4 text-sm underline">Chọn hết </button>
+                    <button className="italic text-sm underline">Bỏ chọn hết </button>
+                </div>
             </div>
             <div className="mt-2">
                 <table>
@@ -47,6 +51,7 @@ function Qgfilter() {
                         <th className="p-1 ">Tổng tiền thu</th>
                         <th className="p-1">Thời gian bắt đầu</th>
                         <th className="p-1">Thời gian kết thúc</th>
+                        <th className="p-1">Hiển thị</th>
                     </tr>
                     {
                         qg_data.map((val) => {
@@ -57,6 +62,9 @@ function Qgfilter() {
                                 <td>{val.tongtien}</td>
                                 <td>{val.tgbd}</td>
                                 <td>{val.tgkt}</td>
+                                <td>
+                                    <input type="checkbox" className="p-4 text-xl" />
+                                </td>
                             </tr>
                         )})
                     }
