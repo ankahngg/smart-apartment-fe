@@ -23,14 +23,13 @@ export default function LoginPage() {
                 username,
                 password,
             });
+            console.log(data);
 
-            if (data?.data) {
-                localStorage.setItem('token', data.data);
+            if (data) {
+                console.log(data);
+                localStorage.setItem('accessToken', data);
             }
 
-            // Clear input fields
-            setUsername('');
-            setPassword('');
 
             // Redirect to dashboard
             router.push('/');
@@ -43,11 +42,11 @@ export default function LoginPage() {
 
     const handleLoginError = (error: any) => {
         if (error.response) {
-            alert(error.response.data.message || 'Login failed');
+            console.log(error.response.data.message || 'Login failed');
         } else if (error.request) {
-            alert('No response from server. Please try again.');
+            console.log('No response from server. Please try again.');
         } else {
-            alert('An unexpected error occurred. Please try again.');
+            console.log('An unexpected error occurred. Please try again.');
         }
     };
 

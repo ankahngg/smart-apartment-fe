@@ -1,138 +1,118 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import globalSlice from "../../../../redux/globalSlice";
+import axiosInstance from "../../../../utils/axiosConfig";
 
 function Table() {
-    //const col:string[] = ['STT','Mã hóa đơn','Mã căn hộ','Họ tên chủ hộ',,'Đợt thu','Phí quản lí','Phí dịch vụ','Trạng thái','Ngày đóng','Xóa']
-    const data:{stt:number,mhd:string,mch:string,hoten:string,dotthu:string,phiql:number,phidv:number,phigx:number,phish:number,state:string,ngaydong:string}[] = [
-        {
-            stt : 1,
-            mhd : 'HD1002',
-            mch : '15.02',
-            hoten : 'Nguyen Phuc An Khang',
-            dotthu : 'Thang 10',
-            phiql : 100000,
-            phidv : 100000,
-            phigx : 1000000,
-            phish : 2000000,
-            state : 'Đã đóng',
-            ngaydong : '20-10-2023'
-        },
-        {
-            stt : 2,
-            mhd : 'HD1001',
-            mch : '15.02',
-            hoten : 'Nguyen Phuc An Khang',
-            dotthu : 'Thang 10',
-            phiql : 100000,
-            phidv : 100000,
-            phigx : 1000000,
-            phish : 2000000,
-            state : 'Chưa đóng',
-            ngaydong : '20-10-2023'
-        }
-    ]
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        const fetchInvoices = async () => {
+            try {
+                setLoading(true);
+                const response = await axiosInstance.post('/api/v1/invoices/search', {
+                    pageable: {
+                        page: 0,
+                        pageSize: 20,
+                    },
+                });
+                const fetchedData = response.data.content.map((item, index) => ({
+                    stt: index + 1,
+                    mhd: item.id,
+                    mch: item.apartment?.code || "N/A", // Xử lý null-safe cho item.apartment
+                    hoten: item.apartment?.owner?.fullName || "N/A", // Xử lý null-safe cho item.apartment.owner
+                    dotthu: item.startDate?.split("T")[0] || "",
+                    hanthu: item.dueDate?.split("T")[0] || "",
+                    phish: item.totalAmount || 0,
+                    paidAmount: item.paidAmount || 0,
+                    state: item.status || "N/A",
+                    ngaydong: item.completedPayDate?.split("T")[0] || "Chưa đóng",
+                }));
+                setData(fetchedData);
+            } catch (err) {
+                setError(err);
+                console.error("Error fetching invoices:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInvoices();
+    }, []);
+
+    // if (loading) return <div>Đang tải...</div>;
+    // if (error) return <div>Có lỗi xảy ra: {error.message}</div>;
+
     return (
-    <div className="w-full p-4 border-black border-2 h-[700px]">
-        <div className="flex justify-between">
-            <div>
-                <div className="text-xl font-bold">Danh sách hóa đơn</div>
-                <div className="pt-2">
-                    <div className="flex space-x-2">
-                        <div className="text-sm">Hiển thị</div>
-                        <select className="border-gray-200 boder-2 bg-gray-200 text-sm">
-                            <option>10</option>
-                            <option>11</option>
-                        </select>
-                        <div className="text-sm">hàng</div>
-                    </div>
-                </div>
-            </div>
-            <div className="flex items-center">
-                <div className="mr-5">
-                    <button className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
-                    onClick={()=>dispatch(globalSlice.actions.dongtien(true))}
-                    >ĐÓNG TIỀN</button>
-                </div>
+        <div className="w-full p-4 border-black border-2 h-[700px]">
+            <div className="flex justify-between">
                 <div>
-                    <div className="text-xl font-bold">Thời hạn đóng phí</div>
-                    <div className="">
-                        <span className="text-l italic">Tháng 11</span>
-                        <span className="text-l italic">- 2025</span>
+                    <div className="text-xl font-bold">Danh sách hóa đơn</div>
+                    <div className="pt-2">
                     </div>
                 </div>
-
+                <div className="flex items-center">
+                    <div className="mr-5">
+                        <button
+                            className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
+                            onClick={() => dispatch(globalSlice.actions.dongtien(true))}
+                        >
+                            ĐÓNG TIỀN
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-
-        <div className="mt-2">
-            <table className="w-full">
-                <tr className="border-b-2 border-black mb-2">
-                        <th className="p-2 text-center w-fit">STT</th>
-                        <th className="p-2 text-center w-fit">MHD</th>
-                        <th className="p-2 text-center w-fit">Mã căn hộ</th>
-                        <th className="p-2 text-center w-[200px]">Họ tên chủ hộ</th>
-                        <th className="p-2 text-center">Đợt thu</th>
-                        <th className="p-2 text-center">Phí dịch vụ</th>
-                        <th className="p-2 text-center">Phí quản lý</th>
-                        <th className="p-2 text-center">Phí gửi xe</th>
-                        <th className="p-2 text-center">Phí sinh hoạt</th>
-                        <th className="p-2 text-center">Trạng thái</th>
-                        <th className="p-2 text-center">Ngày đóng</th>
-                        <th className="p-2 text-center">Hành động</th>
-                </tr>
-                {
-                    data.map((val)=> {
-                        const [more, setMore] = useState(false);
-                        return (
-                            <tr className="align-top hover:bg-[#68d3cc1c]">
-                                <td className="text-center">{val.stt}</td>
+            <div className="mt-2 ">
+                <table className="w-full">
+                    <thead>
+                        <tr className="border-b-2 border-black">
+                            <th className="p-2 text-center">MHD</th>
+                            <th className="p-2 text-center">Mã căn hộ</th>
+                            <th className="p-2 text-center">Họ tên chủ hộ</th>
+                            <th className="p-2 text-center">Đợt thu</th>
+                            <th className="p-2 text-center">Hạn thu</th>
+                            <th className="p-2 text-center">Tổng</th>
+                            <th className="p-2 text-center">Đã đóng</th>
+                            <th className="p-2 text-center">Trạng thái</th>
+                            <th className="p-2 text-center">Ngày đóng cuối</th>
+                            <th className="p-2 text-center">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.map((val) => (
+                            <tr className="hover:bg-[#68d3cc1c]" key={val.mhd}>
                                 <td className="text-center">{val.mhd}</td>
                                 <td className="text-center">{val.mch}</td>
-                                <td className="text-center w-[200px]">{val.hoten}</td>
+                                <td className="text-center">{val.hoten}</td>
                                 <td className="text-center">{val.dotthu}</td>
-                                <td className="text-center">{(val.phidv).toLocaleString('de-DE')}</td>
-                                <td className="text-center"> {(val.phiql).toLocaleString('de-DE')}</td>
-                                <td className="text-center"> {(val.phigx).toLocaleString('de-DE')}</td>
-                                <td className="text-center"> 
-                                    <button onClick={()=>setMore(!more)}>
-                                        {(val.phish).toLocaleString('de-DE')}
-                                    </button>
-                                    {
-                                        more == true ?
-                                        (<div>
-                                            <div className="text-left text-sm">Tiền điện 100k</div>
-                                            <div className="text-left text-sm">Tiền nước 200k</div>
-                                            <div className="text-left text-sm">Tiền mạng 100k</div>
-                                        </div>
-                                        )
+                                <td className="text-center">{val.hanthu}</td>
+                                <td className="text-center">{val.phish.toLocaleString('de-DE')} VNĐ</td>
+                                <td className="text-center">{val.paidAmount} VNĐ</td>
 
-                                        :
-                                        (<div></div>)
-                                    }
+                                <td
+                                    className={`text-center font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"
+                                        }`}
+                                >
+                                    {val.state}
                                 </td>
-                                {
-                                    val.state == "Đã đóng" ?
-                                    <td className="text-center text-green-500 font-bold">{val.state}</td>
-                                    :
-                                    <td className="text-center text-red-500 font-bold">{val.state}</td>
-                                }
                                 <td className="text-center">{val.ngaydong}</td>
                                 <td className="text-center">
-                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
-                                    onClick={()=>dispatch(globalSlice.actions.chinhsua_fee(true))}
-                                    >Chỉnh sửa</button>
+                                    <button
+                                        className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
+                                        onClick={() => dispatch(globalSlice.actions.chinhsua_fee(true))}
+                                    >
+                                        Chỉnh sửa
+                                    </button>
                                 </td>
                             </tr>
-                        )
-                    })
-                }
-            </table>
-
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
     );
 }
 

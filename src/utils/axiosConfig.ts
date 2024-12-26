@@ -13,7 +13,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         // Nếu có token, thêm vào header Authorization
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('accessToken');
         if (token && !config.url?.includes('/auth')) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
