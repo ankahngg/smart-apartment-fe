@@ -88,6 +88,7 @@ function Filter() {
                         }
                     </select>
 
+
                     <input type="text" placeholder="CHỌN CĂN HỘ EX : 2.05" className="text-black text-l w-full  p-2 border-black border-2 mb-2 rounded-xl"
                     onChange={(e)=>setHouse(e.target.value)} value={house}
                     /> 
