@@ -31,6 +31,10 @@ axiosInstance.interceptors.response.use(
         return response.data;
     },
     (error) => {
+        if (error.response.status === 401) {
+            localStorage.removeItem('accessToken');
+            window.location.href = '/login';
+        }
         console.error('API Error:', error.response || error.message);
         return Promise.reject(error);
     }

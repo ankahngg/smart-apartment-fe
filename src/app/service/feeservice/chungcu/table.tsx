@@ -1,58 +1,88 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import globalSlice from "../../../../redux/globalSlice";
 import axiosInstance from "../../../../utils/axiosConfig";
+import { Pagination } from "antd";
+import type { PaginationProps } from "antd";
 
-function Table() {
-    const [data, setData] = useState([]);
+interface Invoice {
+    stt: number;
+    mhd: number;
+    mch: string;
+    hoten: string;
+    dotthu: string;
+    hanthu: string;
+    phish: number;
+    paidAmount: number;
+    state: string;
+    ngaydong: string;
+}
+
+const Table: React.FC = () => {
+    const [data, setData] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [pageSize] = useState(10); // Số item mỗi trang
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchInvoices = async () => {
+        const fetchInvoices = async (page: number) => {
             try {
                 setLoading(true);
-                const response = await axiosInstance.post('/api/v1/invoices/search', {
-                    pageable: {
-                        page: 0,
-                        pageSize: 20,
-                    },
+                const response = await axiosInstance.post("/api/v1/invoices/search", {
+                    page: page - 1,
+                    pageSize,
                 });
-                const fetchedData = response.data.content.map((item, index) => ({
-                    stt: index + 1,
-                    mhd: item.id,
-                    mch: item.apartment?.code || "N/A", // Xử lý null-safe cho item.apartment
-                    hoten: item.apartment?.owner?.fullName || "N/A", // Xử lý null-safe cho item.apartment.owner
-                    dotthu: item.startDate?.split("T")[0] || "",
-                    hanthu: item.dueDate?.split("T")[0] || "",
-                    phish: item.totalAmount || 0,
-                    paidAmount: item.paidAmount || 0,
-                    state: item.status || "N/A",
-                    ngaydong: item.completedPayDate?.split("T")[0] || "Chưa đóng",
-                }));
-                setData(fetchedData);
+                console.log('API Response:', response.data);  // Log the response for debugging
+                if (response.data && response.data.content) {
+                    const fetchedData = response.data.content.map((item: any, index: number) => ({
+                        stt: index + 1 + (page - 1) * pageSize,
+                        mhd: item.id,
+                        mch: item.apartment?.code || "N/A",
+                        hoten: item.apartment?.owner?.fullName || "N/A",
+                        dotthu: item.startDate?.split("T")[0] || "",
+                        hanthu: item.dueDate?.split("T")[0] || "",
+                        phish: item.totalAmount || 0,
+                        paidAmount: item.paidAmount || 0,
+                        state: item.status || "N/A",
+                        ngaydong: item.completedPayDate?.split("T")[0] || "Chưa đóng",
+                    }));
+                    setData(fetchedData); // Cập nhật state `data`
+                    setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
+                    console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+                } else {
+                    setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
+                    setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
+                }
             } catch (err) {
-                setError(err);
+                setError(err as Error);
                 console.error("Error fetching invoices:", err);
             } finally {
-                setLoading(false);
+                setLoading(false); // Cập nhật state `loading` để không hiển thị trạng thái đang tải nữa
             }
         };
 
-        fetchInvoices();
-    }, []);
+        fetchInvoices(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+    }, [currentPage, pageSize]); // Các dependency bao gồm `currentPage` và `pageSize`
 
-    // if (loading) return <div>Đang tải...</div>;
-    // if (error) return <div>Có lỗi xảy ra: {error.message}</div>;
+    const handlePageChange: PaginationProps["onChange"] = (page) => {
+        setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
+    };
+
+    // Tính toán chỉ số bản ghi đầu tiên và cuối cùng
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+
+    if (loading) return <div>Đang tải...</div>;
+    if (error) return <div>Có lỗi xảy ra: {error.message}</div>;
 
     return (
         <div className="w-full p-4 border-black border-2 h-[700px]">
             <div className="flex justify-between">
                 <div>
                     <div className="text-xl font-bold">Danh sách hóa đơn</div>
-                    <div className="pt-2">
-                    </div>
                 </div>
                 <div className="flex items-center">
                     <div className="mr-5">
@@ -65,7 +95,7 @@ function Table() {
                     </div>
                 </div>
             </div>
-            <div className="mt-2 ">
+            <div className="mt-2">
                 <table className="w-full">
                     <thead>
                         <tr className="border-b-2 border-black">
@@ -82,38 +112,54 @@ function Table() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data.map((val) => (
-                            <tr className="hover:bg-[#68d3cc1c]" key={val.mhd}>
-                                <td className="text-center">{val.mhd}</td>
-                                <td className="text-center">{val.mch}</td>
-                                <td className="text-center">{val.hoten}</td>
-                                <td className="text-center">{val.dotthu}</td>
-                                <td className="text-center">{val.hanthu}</td>
-                                <td className="text-center">{val.phish.toLocaleString('de-DE')} VNĐ</td>
-                                <td className="text-center">{val.paidAmount} VNĐ</td>
-
-                                <td
-                                    className={`text-center font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"
-                                        }`}
-                                >
-                                    {val.state}
-                                </td>
-                                <td className="text-center">{val.ngaydong}</td>
-                                <td className="text-center">
-                                    <button
-                                        className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
-                                        onClick={() => dispatch(globalSlice.actions.chinhsua_fee(true))}
-                                    >
-                                        Chỉnh sửa
-                                    </button>
+                        {data.length > 0 ? (
+                            data.map((val) => (
+                                <tr className="hover:bg-[#68d3cc1c]" key={val.mhd}>
+                                    <td className="text-center">{val.mhd}</td>
+                                    <td className="text-center">{val.mch}</td>
+                                    <td className="text-center">{val.hoten}</td>
+                                    <td className="text-center">{val.dotthu}</td>
+                                    <td className="text-center">{val.hanthu}</td>
+                                    <td className="text-center">{val.phish.toLocaleString("de-DE")} VNĐ</td>
+                                    <td className="text-center">{val.paidAmount} VNĐ</td>
+                                    <td className={`text-center font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"}`}>
+                                        {val.state}
+                                    </td>
+                                    <td className="text-center">{val.ngaydong}</td>
+                                    <td className="text-center">
+                                        <button
+                                            className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
+                                            onClick={() => dispatch(globalSlice.actions.chinhsua_fee(true))}
+                                        >
+                                            Chỉnh sửa
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={10} className="text-center">
+                                    Không có dữ liệu.
                                 </td>
                             </tr>
-                        ))}
+                        )}
                     </tbody>
                 </table>
+                <div className="flex justify-between items-center mt-4">
+                    <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} hóa đơn</div>
+
+                    <Pagination
+                        current={currentPage}
+                        onChange={handlePageChange}
+                        total={totalItems}
+                        pageSize={pageSize}
+                        style={{ marginTop: "16px", textAlign: "center" }}
+                    />
+                </div>
+
             </div>
         </div>
     );
-}
+};
 
 export default Table;
