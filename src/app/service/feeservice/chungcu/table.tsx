@@ -31,9 +31,10 @@ const Table: React.FC = () => {
         const fetchInvoices = async (page: number) => {
             try {
                 setLoading(true);
-                const response = await axiosInstance.post("http://localhost:8080/api/v1/invoices/search", {
+                const response = await axiosInstance.post("/api/v1/invoices/search", {
                     page: page - 1,
                     pageSize,
+                    filters: [],
                     sorts: [
                         { property: "createdAt", direction: "desc" }]
                 });
@@ -70,7 +71,7 @@ const Table: React.FC = () => {
         fetchInvoices(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
     }, [currentPage, pageSize]); // Các dependency bao gồm `currentPage` và `pageSize`
 
-    const handlePageChange: PaginationProps["onChange"] = (page:any) => {
+    const handlePageChange: PaginationProps["onChange"] = (page: any) => {
         setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
     };
 
@@ -100,19 +101,19 @@ const Table: React.FC = () => {
             </div>
             <div className="mt-2">
                 <table className="w-full">
-                        <tr className="border-b-2 border-black">
-                            <th className="p-2 text-center">MHD</th>
-                            <th className="p-2 text-center">Mã căn hộ</th>
-                            <th className="p-2 text-center">Họ tên chủ hộ</th>
-                            <th className="p-2 text-center">Đợt thu</th>
-                            <th className="p-2 text-center">Hạn thu</th>
-                            <th className="p-2 text-center">Tổng</th>
-                            <th className="p-2 text-center">Đã đóng</th>
-                            <th className="p-2 text-center">Trạng thái</th>
-                            <th className="p-2 text-center">Ngày đóng cuối</th>
-                            <th className="p-2 text-center">Hành động</th>
-                        </tr>
-                        {data.length > 0 ? (
+                    <tr className="border-b-2 border-black">
+                        <th className="p-2 text-center">MHD</th>
+                        <th className="p-2 text-center">Mã căn hộ</th>
+                        <th className="p-2 text-center">Họ tên chủ hộ</th>
+                        <th className="p-2 text-center">Đợt thu</th>
+                        <th className="p-2 text-center">Hạn thu</th>
+                        <th className="p-2 text-center">Tổng</th>
+                        <th className="p-2 text-center">Đã đóng</th>
+                        <th className="p-2 text-center">Trạng thái</th>
+                        <th className="p-2 text-center">Ngày đóng cuối</th>
+                        <th className="p-2 text-center">Hành động</th>
+                    </tr>
+                    {data.length > 0 ? (
                         data.map((val) => (
                             <tr className="hover:bg-[#68d3cc1c] p-5" key={val.mhd}>
                                 <td className="text-center">{val.mhd}</td>
@@ -143,7 +144,7 @@ const Table: React.FC = () => {
                             </td>
                         </tr>
                     )}
-                    
+
                 </table>
                 <div className="flex justify-between items-center mt-4">
                     <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} hóa đơn</div>
