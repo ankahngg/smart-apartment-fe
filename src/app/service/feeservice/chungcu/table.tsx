@@ -34,12 +34,15 @@ const Table: React.FC = () => {
                 const response = await axiosInstance.post("/api/v1/invoices/search", {
                     page: page - 1,
                     pageSize,
+                    sorts: [
+                        { property: "createdAt", direction: "desc" }]
                 });
                 console.log('API Response:', response.data);  // Log the response for debugging
                 if (response.data && response.data.content) {
                     const fetchedData = response.data.content.map((item: any, index: number) => ({
                         stt: index + 1 + (page - 1) * pageSize,
-                        mhd: item.id,
+                        id: item.id,
+                        mhd: item.invoiceCode,
                         mch: item.apartment?.code || "N/A",
                         hoten: item.apartment?.owner?.fullName || "N/A",
                         dotthu: item.startDate?.split("T")[0] || "",
@@ -75,8 +78,8 @@ const Table: React.FC = () => {
     const startItem = (currentPage - 1) * pageSize + 1;
     const endItem = Math.min(currentPage * pageSize, totalItems);
 
-    if (loading) return <div>Đang tải...</div>;
-    if (error) return <div>Có lỗi xảy ra: {error.message}</div>;
+    // if (loading) return <div>Đang tải...</div>;
+    // if (error) return <div>Có lỗi xảy ra: {error.message}</div>;
 
     return (
         <div className="w-full p-4 border-black border-2 h-[700px]">

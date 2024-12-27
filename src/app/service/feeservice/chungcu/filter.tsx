@@ -1,5 +1,6 @@
 import React from "react";
 import { useFilter } from "../chungcu/useFilter";
+import MonthYearPicker from "@/app/components/MonthYearPicker";
 
 const year_filter = ['2024', '2023', '2022', '2021'];
 const session_filter = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
@@ -14,21 +15,7 @@ const Filter: React.FC = () => {
         <div className="flex">
             <div className="p-3 w-[250px] border-black border-2">
                 <div className="text-xl mb-3 p-2 italic">Bộ lọc</div>
-
-                <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => setYear(e.target.value)} value={year}>
-                    <option value="default">CHỌN NĂM</option>
-                    {year_filter.map((val) => (
-                        <option key={val} value={val}>NĂM {val}</option>
-                    ))}
-                </select>
-
-                <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => setMonth(e.target.value)} value={month}>
-                    <option value="default">CHỌN ĐỢT</option>
-                    {session_filter.map((val) => (
-                        <option key={val} value={val}>THÁNG {val}</option>
-                    ))}
-                </select>
-
+                <MonthYearPicker />
                 <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => setState(e.target.value)} value={state}>
                     <option value="default">CHỌN TRẠNG THÁI</option>
                     {status_filter.map((val) => (

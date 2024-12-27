@@ -28,7 +28,7 @@ function Phichungcu() {
                 }
             </div>
 
-            <Mucphi />
+            {/* <Mucphi /> */}
 
         </div>
     );
