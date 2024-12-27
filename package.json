@@ -10,14 +10,18 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.0",
+    "antd": "^5.22.6",
+    "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "next": "15.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.2.0",
-    "redux": "^5.0.1"
+    "redux": "^5.0.1",
+    "smart-apartment-fe": "file:"
   },
   "devDependencies": {
+    "@types/antd": "^0.12.32",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

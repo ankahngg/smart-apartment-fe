@@ -16,20 +16,20 @@ function Phichungcu() {
                 <Table />
                 {
                     dongtien == true ?
-                    <Dongtien />
-                    :
-                    <></>
+                        <Dongtien />
+                        :
+                        <></>
                 }
                 {
                     chinhsua_fee == true ?
-                    <Chinhsua />
-                    :
-                    <></>
+                        <Chinhsua />
+                        :
+                        <></>
                 }
             </div>
-            
+
             <Mucphi />
-            
+
         </div>
     );
 }
