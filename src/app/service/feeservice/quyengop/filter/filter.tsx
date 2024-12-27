@@ -1,20 +1,82 @@
+import { useEffect, useState } from "react";
 import Qgfilter from "./qgfilter";
+import axiosInstance from "@/utils/axiosConfig";
+
+interface floors {
+    id : number, 
+    name : string,
+    floorNumber : number,
+}
+
+interface apartments {
+    id : number,
+    name : string,
+    code : string,
+}
 
 function Filter() {
-    const floor_filter: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15']
-    const apartment_filter: string[] = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']
+    const [floordata,setFloordata] = useState<floors[]>([])
+    const [apartmentdata,setApartmentdata] = useState<apartments[]>([])
+
+    useEffect(() => {
+        const fetchInit = async () => {
+            const response = await axiosInstance.post("/api/v1/floors/search",{
+                pageSize : 999,
+            })
+            if (response.data && response.data.content) {
+                const fetchedData = response.data.content.map((item: any, index: number) => ({
+                    
+                    id: item.id,
+                    name: item.name,
+                    floorNumber: item.floorNumber,
+                }));
+                setFloordata(fetchedData); // Cập nhật state `data`
+                console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+            } else {
+                setFloordata([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
+            }
+        }
+        fetchInit();
+        
+    },[])
+    
+
+    async function handleFloor(id:string) {
+        const response = await axiosInstance.post("/api/v1/apartments/search",{
+            pageSize : 999,
+            filters : [
+                {
+                    name:"floorId",operation:"eq",value:id
+                }
+            ]
+        })
+        if (response.data && response.data.content) {
+            const fetchedData = response.data.content.map((item: any, index: number) => ({
+                id: item.id,
+                name: item.name,
+                code: item.code,
+            }));
+            setApartmentdata(fetchedData); // Cập nhật state `data`
+            console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+        } else {
+            setApartmentdata([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
+        }
+    }
+
     return (
         <div className="border-2 p-2 border-black h-full">
             <div className="p-2 italic text-xl ">Bộ lọc</div>
             <div className="flex mb-2">
 
                 <div className="flex-1">
-                    <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl" >
+                    <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl"
+                    onChange={(e)=>handleFloor(e.target.value)}
+                    >
                         <option value={'default'}>CHỌN TẦNG</option>
                         {
-                            floor_filter.map((val) => {
+                            floordata.map((val) => {
                                 return (
-                                    <option value={val}> TẦNG {val}</option>
+                                    <option value={val.id}> {val.name}</option>
                                 )
                             })
                         }
@@ -25,9 +87,9 @@ function Filter() {
                     <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl" >
                         <option value={'default'}>CHỌN CĂN HỘ</option>
                         {
-                            apartment_filter.map((val) => {
+                            apartmentdata.map((val) => {
                                 return (
-                                    <option value={val}> CĂN HỘ {val}</option>
+                                    <option value={val.id}> {val.name}</option>
                                 )
                             })
                         }

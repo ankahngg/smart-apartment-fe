@@ -10,14 +10,16 @@ const MonthYearPicker = () => {
 
     const handleChange = (value: any) => {
         setDate(value);
+        alert(value)
     };
 
     return (
-        <div>
+        <div className="">
             <MonthPicker
                 onChange={handleChange}
                 format="YYYY-MM"
-                placeholder="Chọn tháng cho anh"
+                placeholder="CHỌN ĐỢT THU"
+                className ="p-2 text-l font-medium border-2 border-black w-full rounded-xl mb-2 "
             />
         </div>
     );

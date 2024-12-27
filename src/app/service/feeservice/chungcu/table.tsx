@@ -100,33 +100,33 @@ const Table: React.FC = () => {
             </div>
             <div className="mt-2">
                 <table className="w-full">
-                        <tr className="border-b-2 border-black">
-                            <th className="p-2 text-center">MHD</th>
-                            <th className="p-2 text-center">Mã căn hộ</th>
-                            <th className="p-2 text-center">Họ tên chủ hộ</th>
-                            <th className="p-2 text-center">Đợt thu</th>
-                            <th className="p-2 text-center">Hạn thu</th>
-                            <th className="p-2 text-center">Tổng</th>
-                            <th className="p-2 text-center">Đã đóng</th>
-                            <th className="p-2 text-center">Trạng thái</th>
-                            <th className="p-2 text-center">Ngày đóng cuối</th>
-                            <th className="p-2 text-center">Hành động</th>
+                        <tr className="border-b-2 border-black text-center">
+                            <th className="p-2">MHD</th>
+                            <th className="p-2">Mã căn hộ</th>
+                            <th className="p-2">Họ tên chủ hộ</th>
+                            <th className="p-2">Đợt thu</th>
+                            <th className="p-2">Hạn thu</th>
+                            <th className="p-2">Tổng</th>
+                            <th className="p-2">Đã đóng</th>
+                            <th className="p-2">Trạng thái</th>
+                            <th className="p-2">Ngày đóng cuối</th>
+                            <th className="p-2">Hành động</th>
                         </tr>
                         {data.length > 0 ? (
                         data.map((val) => (
-                            <tr className="hover:bg-[#68d3cc1c] p-5" key={val.mhd}>
-                                <td className="text-center">{val.mhd}</td>
-                                <td className="text-center">{val.mch}</td>
-                                <td className="text-center">{val.hoten}</td>
-                                <td className="text-center">{val.dotthu}</td>
-                                <td className="text-center">{val.hanthu}</td>
-                                <td className="text-center">{val.phish.toLocaleString("de-DE")} VNĐ</td>
-                                <td className="text-center">{val.paidAmount} VNĐ</td>
-                                <td className={`text-center font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"}`}>
+                            <tr className="hover:bg-[#68d3cc1c] text-center" key={val.mhd} >
+                                <td className="p-2 ">{val.mhd}</td>
+                                <td className="p-2 ">{val.mch}</td>
+                                <td className="p-2">{val.hoten}</td>
+                                <td className="p-2">{val.dotthu}</td>
+                                <td className="p-2">{val.hanthu}</td>
+                                <td className="p-2">{val.phish.toLocaleString("de-DE")} VNĐ</td>
+                                <td className="p-2">{val.paidAmount} VNĐ</td>
+                                <td className={`p-2 font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"}`}>
                                     {val.state}
                                 </td>
-                                <td className="text-center">{val.ngaydong}</td>
-                                <td className="text-center">
+                                <td className="p-2">{val.ngaydong}</td>
+                                <td className="p-2">
                                     <button
                                         className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
                                         onClick={() => dispatch(globalSlice.actions.chinhsua_fee(true))}

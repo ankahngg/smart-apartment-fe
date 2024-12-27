@@ -1,33 +1,126 @@
 import globalSlice from "@/redux/globalSlice";
 import { useAppDispatch } from "@/redux/hooks"
+import axiosInstance from "@/utils/axiosConfig";
+import { useEffect,useState } from "react";
+
+interface Chiendich{
+    maqg:number,tenqg:string,tongtien:number,tgbd:string,tgkt:string
+}
+const getFormattedDate = (): string => {
+    const now = new Date();
+  
+    const year = now.getUTCFullYear();
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+    const day = String(now.getUTCDate()).padStart(2, "0");
+  
+    const hours = String(now.getUTCHours()).padStart(2, "0");
+    const minutes = String(now.getUTCMinutes()).padStart(2, "0");
+    const seconds = String(now.getUTCSeconds()).padStart(2, "0");
+    const milliseconds = String(now.getUTCMilliseconds()).padStart(3, "0");
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}+00:00`;
+  };
+  
+  console.log(getFormattedDate());
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
 
 function Qgfilter() {
+    const [data, setData] = useState<Chiendich[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const [pageSize] = useState(10); // Số item mỗi trang
     const dispatch = useAppDispatch()
-    const qg_data:{maqg:string,tenqg:string,tongtien:number,tgbd:string,tgkt:string}[] = [
-        {
-            maqg : "qg00",
-            tenqg : "quy tre em hiem ngheo 2024 - 2025",
-            tongtien : 100055,
-            tgbd : "20-10-2024",
-            tgkt : "30-10-2025"
-        },
-        {
-            maqg : "qg00",
-            tenqg : "quy tre em hiem nghedadada dadad qerrqr o 2024 - 2025",
-            tongtien : 100055,
-            tgbd : "20-10-2024",
-            tgkt : "30-10-2025"
-        },
 
-    ]
+    useEffect(() => {
+        const fetchCampaigns = async (page: number) => {
+                const response = await axiosInstance.post("/api/v1/campaigns/search", {
+                    pageSize : 999,
+                    sorts: [
+                        { property: "createdAt", direction: "desc" }]
+                    });
+                    console.log('API Response:', response.data);  // Log the response for debugging
+                if (response.data && response.data.content) {
+                    const fetchedData = response.data.content.map((item: any, index: number) => ({
+                        maqg: item.id,
+                        tenqg: item.name,
+                        tongtien: (item.total?item.total:0),
+                        tgbd : formatDate(item.startDate),
+                        tgkt : formatDate(item.endDate),
+                    }));
+                    setData(fetchedData); // Cập nhật state `data`
+                    setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
+                    console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+                } else {
+                    setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
+                    setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
+                }
+            
+        };
+
+        fetchCampaigns(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+    }, [currentPage, pageSize]); // Các dependency bao gồm `currentPage` và `pageSize`
+    
+    // console.log(data[0].tgbd)
+    var arr:number[] = []
+    function handleCheck(checked:boolean,id:number) {
+        if(checked) arr.push(id);
+        else arr = arr.filter((val,index) => val!=id);
+        
+    }
+
+    async function handleStatus(status:string) {
+        var close_filters :{name:string,operation:string,value:string,type:string}[]= [
+            {
+                name:"endDate",operation:"lt",value:getFormattedDate(),type:"string"
+            }
+        ]
+        var all_filters :{name:string,operation:string,value:string,type:string}[]= [
+            
+        ]
+        var open_filters :{name:string,operation:string,value:string,type:string}[]= [
+            {
+                name:"endDate",operation:"gt",value:getFormattedDate(),type:"string"
+            }
+        ]
+        const response = await axiosInstance.post("/api/v1/campaigns/search", {
+            pageSize : 999,
+            sorts: [{ property: "createdAt", direction: "desc" }],
+            filters : (status=='all'? all_filters: status=='open'?open_filters:close_filters)
+            }
+        );
+        if (response.data && response.data.content) {
+            const fetchedData = response.data.content.map((item: any, index: number) => ({
+                maqg: item.id,
+                tenqg: item.name,
+                tongtien: (item.total?item.total:0),
+                tgbd : formatDate(item.startDate),
+                tgkt : formatDate(item.endDate),
+            }));
+            setData(fetchedData); // Cập nhật state `data`
+            setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
+            console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+        } else {
+            setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
+            setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
+        }
+
+    }
+
     return (
         <div>
             <div className="flex justify-between items-center ">
                 <div className="w-fit">
-                    <select className="border-2 border-black p-2 rounded-xl mr-2">
-                        <option>TẤT CẢ</option>
-                        <option>VẪN CÒN THU</option>
-                        <option>ĐÃ ĐÓNG ĐƠN</option>
+                    <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>handleStatus(e.target.value)}>
+                        <option value='all'>TẤT CẢ</option>
+                        <option value='close'>VẪN CÒN THU</option>
+                        <option value='open'>ĐÃ ĐÓNG ĐƠN</option>
                     </select>
                 </div>
                 <div className="w-full">
@@ -54,7 +147,8 @@ function Qgfilter() {
                         <th className="p-1">Hiển thị</th>
                     </tr>
                     {
-                        qg_data.map((val) => {
+                        data.map((val) => {
+                            
                             return (
                             <tr className="text-center text-sm align-top hover:bg-[#68d3cc1c]">
                                 <td>{val.maqg}</td>
@@ -63,7 +157,7 @@ function Qgfilter() {
                                 <td>{val.tgbd}</td>
                                 <td>{val.tgkt}</td>
                                 <td>
-                                    <input type="checkbox" className="p-4 text-xl" />
+                                    <input type="checkbox" onChange={(e)=>handleCheck(e.target.checked,val.maqg)} className="p-4 text-xl" />
                                 </td>
                             </tr>
                         )})
