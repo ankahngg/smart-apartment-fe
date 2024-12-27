@@ -1,16 +1,18 @@
-'use client'
-import React, { useState } from "react";
+import React from "react";
 import { DatePicker } from "antd";
-
 
 const { MonthPicker } = DatePicker;
 
-const MonthYearPicker = () => {
-    const [date, setDate] = useState(null);
+interface MonthYearPickerProps {
+    setDate: (date: string) => void; // Nhận một hàm để set giá trị dạng YYYY-MM
+}
 
+const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ setDate }) => {
     const handleChange = (value: any) => {
-        setDate(value);
-        alert(value)
+        if (value) {
+            const formattedDate = value.format("YYYY-MM");
+            setDate(formattedDate);
+        }
     };
 
     return (

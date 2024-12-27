@@ -1,34 +1,36 @@
 import { useState } from "react";
 
 export const useFilter = () => {
-    const [year, setYear] = useState('default');
-    const [month, setMonth] = useState('default');
-    const [state, setState] = useState('default');
-    const [floor, setFloor] = useState('default');
-    const [house, setHouse] = useState('');
-    const [name, setName] = useState('');
+    const [date, setDate] = useState<string>(""); // Dùng chuỗi để lưu dạng YYYY-MM
+    const [state, setState] = useState<string>("");
+    const [floor, setFloor] = useState<string>("");
+    const [house, setHouse] = useState<string>("");
+    const [name, setName] = useState<string>("");
 
     const resetFilter = () => {
-        setYear('default');
-        setMonth('default');
-        setState('default');
-        setFloor('default');
-        setHouse('');
-        setName('');
+        setDate("");
+        setState("");
+        setFloor("");
+        setHouse("");
+        setName("");
     };
 
     const applyFilter = () => {
-        console.log(year, month, state, floor, house, name);
+        console.log({ date, state, floor, house, name });
     };
 
     return {
-        year, setYear,
-        month, setMonth,
-        state, setState,
-        floor, setFloor,
-        house, setHouse,
-        name, setName,
+        date,
+        setDate,
+        state,
+        setState,
+        floor,
+        setFloor,
+        house,
+        setHouse,
+        name,
+        setName,
         resetFilter,
-        applyFilter
+        applyFilter,
     };
 };

@@ -31,9 +31,10 @@ const Table: React.FC = () => {
         const fetchInvoices = async (page: number) => {
             try {
                 setLoading(true);
-                const response = await axiosInstance.post("http://localhost:8080/api/v1/invoices/search", {
+                const response = await axiosInstance.post("/api/v1/invoices/search", {
                     page: page - 1,
                     pageSize,
+                    filters: [],
                     sorts: [
                         { property: "createdAt", direction: "desc" }]
                 });
@@ -70,7 +71,7 @@ const Table: React.FC = () => {
         fetchInvoices(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
     }, [currentPage, pageSize]); // Các dependency bao gồm `currentPage` và `pageSize`
 
-    const handlePageChange: PaginationProps["onChange"] = (page:any) => {
+    const handlePageChange: PaginationProps["onChange"] = (page: any) => {
         setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
     };
 
@@ -143,7 +144,7 @@ const Table: React.FC = () => {
                             </td>
                         </tr>
                     )}
-                    
+
                 </table>
                 <div className="flex justify-between items-center mt-4">
                     <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} hóa đơn</div>
