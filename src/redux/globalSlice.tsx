@@ -1,4 +1,4 @@
-import Themchiendich from "@/app/service/feeservice/quyengop/themchiendich";
+import Themchiendich from "@/app/service/feeservice/quyengop/filter/themchiendich";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 interface StateType {

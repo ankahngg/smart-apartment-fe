@@ -2,6 +2,7 @@ import globalSlice from "@/redux/globalSlice";
 import { useAppDispatch } from "@/redux/hooks"
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect,useState } from "react";
+import Themchiendich from "./themchiendich";
 
 interface Chiendich{
     maqg:number,tenqg:string,tongtien:number,tgbd:string,tgkt:string
@@ -33,49 +34,14 @@ const formatDate = (dateString: string): string => {
 
 function Qgfilter() {
     const [data, setData] = useState<Chiendich[]>([]);
+    const [addcp,setAddcp] = useState(false)
+    const [reload,setReload] = useState(false)
+    const [state,setState] = useState('all')
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    const [pageSize] = useState(10); // Số item mỗi trang
-    const dispatch = useAppDispatch()
-
+    const [choosen, setChoosen] = useState<boolean[]>([]);
+    const [size,setSize] = useState(0)
+    console.log("vcl",size)
     useEffect(() => {
-        const fetchCampaigns = async (page: number) => {
-                const response = await axiosInstance.post("/api/v1/campaigns/search", {
-                    pageSize : 999,
-                    sorts: [
-                        { property: "createdAt", direction: "desc" }]
-                    });
-                    console.log('API Response:', response.data);  // Log the response for debugging
-                if (response.data && response.data.content) {
-                    const fetchedData = response.data.content.map((item: any, index: number) => ({
-                        maqg: item.id,
-                        tenqg: item.name,
-                        tongtien: (item.total?item.total:0),
-                        tgbd : formatDate(item.startDate),
-                        tgkt : formatDate(item.endDate),
-                    }));
-                    setData(fetchedData); // Cập nhật state `data`
-                    setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
-                    console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
-                } else {
-                    setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
-                    setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
-                }
-            
-        };
-
-        fetchCampaigns(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    }, [currentPage, pageSize]); // Các dependency bao gồm `currentPage` và `pageSize`
-    
-    // console.log(data[0].tgbd)
-    var arr:number[] = []
-    function handleCheck(checked:boolean,id:number) {
-        if(checked) arr.push(id);
-        else arr = arr.filter((val,index) => val!=id);
-        
-    }
-
-    async function handleStatus(status:string) {
         var close_filters :{name:string,operation:string,value:string,type:string}[]= [
             {
                 name:"endDate",operation:"lt",value:getFormattedDate(),type:"string"
@@ -89,35 +55,64 @@ function Qgfilter() {
                 name:"endDate",operation:"gt",value:getFormattedDate(),type:"string"
             }
         ]
-        const response = await axiosInstance.post("/api/v1/campaigns/search", {
-            pageSize : 999,
-            sorts: [{ property: "createdAt", direction: "desc" }],
-            filters : (status=='all'? all_filters: status=='open'?open_filters:close_filters)
+        const fetchCampaigns = async (page: number) => {
+            const response = await axiosInstance.post("/api/v1/campaigns/search", {
+                pageSize : 999,
+                filters : (state=='all'? all_filters: state=='open'?open_filters:close_filters),
+                sorts: [
+                    { property: "createdAt", direction: "desc" }]
+                });
+                console.log('API Response:', response.data);  // Log the response for debugging
+            
+            // const tmp = new Array(response.data.content.size).fill(false)
+            setChoosen(new Array(response.data.content.length).fill(false))
+            setSize(response.data.content.length)
+            
+            if (response.data && response.data.content) {
+                const fetchedData = response.data.content.map((item: any, index: number) => {
+                    return ({
+                        maqg: item.id,
+                        tenqg: item.name,
+                        tongtien: (item.total?item.total:0),
+                        tgbd : formatDate(item.startDate),
+                        tgkt : formatDate(item.endDate),
+                    })})
+                setData(fetchedData); // Cập nhật state `data`
+                console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
+            } else {
+                setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
             }
-        );
-        if (response.data && response.data.content) {
-            const fetchedData = response.data.content.map((item: any, index: number) => ({
-                maqg: item.id,
-                tenqg: item.name,
-                tongtien: (item.total?item.total:0),
-                tgbd : formatDate(item.startDate),
-                tgkt : formatDate(item.endDate),
-            }));
-            setData(fetchedData); // Cập nhật state `data`
-            setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
-            console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
-        } else {
-            setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
-            setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
-        }
-
+        };
+        fetchCampaigns(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+    }, [reload,state,addcp]); // Các dependency bao gồm `currentPage` và `pageSize`
+   
+    function handleCheck(checked:boolean,index:number) {
+        setChoosen(choosen.map((val,ind)=>{
+            if(ind == index) return !val
+            else return val
+            }))
     }
 
+    async function handleDelete() {
+        for (const [i, val] of choosen.entries()) {
+            if (val === true) {
+                await axiosInstance.delete(`/api/v1/campaigns/${data[i].maqg}`);
+            }
+        }
+        
+        setReload(!reload)
+    }
     return (
         <div>
+             {
+                addcp == true ?
+                <Themchiendich onShow={setAddcp} />
+                :
+                <></>
+            }
             <div className="flex justify-between items-center ">
                 <div className="w-fit">
-                    <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>handleStatus(e.target.value)}>
+                    <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>setState(e.target.value)}>
                         <option value='all'>TẤT CẢ</option>
                         <option value='close'>VẪN CÒN THU</option>
                         <option value='open'>ĐÃ ĐÓNG ĐƠN</option>
@@ -128,26 +123,28 @@ function Qgfilter() {
                 </div>
             </div>
             <div className="flex justify-between items-center">
-                <button className="border-2 border-black rounded-xl p-1 bg-[#1e83a5] hover:bg-[#176b87] text-white mt-2"
-                onClick={()=>dispatch(globalSlice.actions.themchiendich(true))}
+                <button className=" rounded-xl p-1 bg-[#1e83a5] hover:bg-[#176b87] text-white mt-2"
+                onClick={()=>setAddcp(true)}
                 >THÊM CHIẾN DỊCH</button>
                 <div>
-                    <button className="italic mr-4 text-sm underline">Chọn hết </button>
-                    <button className="italic text-sm underline">Bỏ chọn hết </button>
+                    <button className="italic mr-4 text-sm underline" onClick={()=>{setChoosen(new Array(size).fill(true))}}>Chọn hết </button>
+                    <button className="italic text-sm underline" onClick={()=>{setChoosen(new Array(size).fill(false))}}>Bỏ chọn hết </button>
+                    <button className="ml-2 p-1 bg-[#1e83a5] hover:bg-[#176b87] text-white rounded-xl" onClick={()=>handleDelete()}>Xóa</button>
                 </div>
             </div>
+            
             <div className="mt-2">
                 <table>
                     <tr className="text-sm align-top border-b-2 border-black">
                         <th className="p-1 w-fit">MQG</th>
                         <th className="p-1 w-[150px]">Tên quyên góp</th>
-                        <th className="p-1 ">Tổng tiền thu</th>
+                        <th className="p-1 ">Tổng tiền</th>
                         <th className="p-1">Thời gian bắt đầu</th>
                         <th className="p-1">Thời gian kết thúc</th>
-                        <th className="p-1">Hiển thị</th>
+                        <th className="p-1">Chọn</th>
                     </tr>
                     {
-                        data.map((val) => {
+                        data.map((val,index) => {
                             
                             return (
                             <tr className="text-center text-sm align-top hover:bg-[#68d3cc1c]">
@@ -157,7 +154,7 @@ function Qgfilter() {
                                 <td>{val.tgbd}</td>
                                 <td>{val.tgkt}</td>
                                 <td>
-                                    <input type="checkbox" onChange={(e)=>handleCheck(e.target.checked,val.maqg)} className="p-4 text-xl" />
+                                    <input type="checkbox" checked={choosen[index]} onChange={(e)=>handleCheck(e.target.checked,index)} className="p-4 text-xl" />
                                 </td>
                             </tr>
                         )})

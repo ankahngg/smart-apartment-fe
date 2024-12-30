@@ -25,14 +25,13 @@ export default function Menu(){
     const [service,setService] = useState(false)
     function ServiceDrop() {
         return (
-            <div className='absolute top-[169px] '
-            >
-                <div className='hover:bg-[#64ccc5] bg-[#176b87] p-1'
+            <div className='absolute top-[169px] w-[120px]'>
+                <div className='hover:bg-[#64ccc5] bg-[#176b87] p-1 '
                 onClick={()=>setService(!service)}
                 >
                     <Link
                         href={'/service/feeservice'}
-                        className="text-white p-1"
+                        className="text-white p-1 w-full block"
                     >
                     Phí Chung Cư
                     </Link>
@@ -41,9 +40,18 @@ export default function Menu(){
                 onClick={()=>setService(!service)}>
                     <Link
                         href={'/service/personservice'}
-                        className="text-white p-1 "
+                        className="text-white p-1 w-full block"
                     >
                     Nhân Khẩu
+                    </Link>
+                </div>
+                <div className='bg-[#176b87] hover:bg-[#64ccc5] p-1'
+                onClick={()=>setService(!service)}>
+                    <Link
+                        href={'/service/setting'}
+                        className="text-white p-1 w-full block"
+                    >
+                    Cài Đặt
                     </Link>
                 </div>
             </div>
@@ -59,11 +67,11 @@ export default function Menu(){
                         if(item.name == "Dịch Vụ") {
                             return (
                                 <div className='flex items-center p-2 '> 
-                                    <div className='text-white hover:bg-[#64ccc5] p-2 hover:cursor-pointer'
+                                    <button className='text-white hover:bg-[#64ccc5] p-2 '
                                     // onMouseLeave={()=>setService(false)}
                                     onClick={()=>setService(!service)}
 
-                                    >Dịch Vụ</div>
+                                    >Dịch Vụ</button>
                                     {/* <Link
                                     key={item.name}
                                     href={item.src}

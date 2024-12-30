@@ -1,31 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Themphuongtien from "./themphuongtien";
 import Lichsubd from "../nhankhau/lichsubd";
+import axiosInstance from "@/utils/axiosConfig";
 
-function Phuongtien() {
-    const phuongtien_data:{stt:number,tenpt:string,loaipt:string,bienso:string,ngaythem:string}[] = [
-    {  
-        stt : 1,
-        tenpt : "camry 300",
-        loaipt : "o to",
-        bienso : "15B3-72372",
-        ngaythem : "15-10-2024"
-    },
-    {  
-        stt : 2,
-        tenpt : "air blade 2024",
-        loaipt : "xe may",
-        bienso : "15B1-48612",
-        ngaythem : "20-10-2024"
-    },
-    ]
+interface phuongtien {
+    stt : number,
+    ten : string,
+    loai : string,
+    bienso:string,
+    
+}
+interface newbox {
+    apartId:number
+}
+
+const Phuongtien:React.FC<newbox> =({apartId})=> {
+    const [data,setData] = useState<phuongtien[]>([])
+    const [pageSize,setPageSize] = useState(5); // Số item mỗi trang
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const maxpage = 6;
     const [add,setAdd] = useState(false);
-    const [xemls,setXemls] = useState(false);
+    const [chitiet,setChitiet] = useState(false);
+    const [resid,setResid] = useState('');
+    useEffect(()=>{
+        // alert("here")
+        const fetchVehi = async (page: number) => {
+            const response = await axiosInstance.post("/api/v1/vehicles/search", {
+                page: page - 1,
+                pageSize,
+                filters : [
+                    {
+                        name : "apartmentId",
+                        value : apartId,
+                        operation : "eq"
+                    }
+                ]
+            });
+            console.log('API Response:', response.data);  // Log the response for debugging
+            // const tmp = new Array(response.data.content.size).fill(false)
+            // if (response.data && response.data.content) {
+            //     const fetchedData = response.data.content.map( (item: any, index: number) => {
+            //             return {
+                            
+            //             };
+            //         })
+                
+            //     setData(fetchedData); // Update state with the resolved data
+            //     setTotalItems(response.data.totalElements); // Cập nhật state `totalItems`
+            //     console.log("Fetched Data:", fetchedData); // Log fetched data for debugging
+            // } else {
+            //     setData([]); // Update state with an empty array if no data is available
+            //     setTotalItems(0); // Cập nhật state `totalItems` với giá trị 0
+            // }
+            
+        };
+        fetchVehi(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+    },[currentPage, pageSize,add])
     return (
         <div>
             {
                 add ?
-                <Themphuongtien onShow={setAdd}/>:
+                <Themphuongtien onShow={setAdd} apartId={apartId}/>:
                 <></>
             }
            
@@ -45,22 +81,22 @@ function Phuongtien() {
                         <th className="p-2">Xóa</th>
                     </tr>
                         {
-                            phuongtien_data.map((val,index)=> {
-                                const [more, setMore] = useState(false);
-                                return (
-                                    <tr className="align-top hover:bg-[#68d3cc1c] text-center">
-                                        <td className="p-2">{val.stt}</td>
-                                        <td className="w-[150px] p-2">{val.tenpt}</td>
-                                        <td className="p-2 ">{val.loaipt}</td>
-                                        <td className="p-2 w-[150px]">{val.bienso}</td>
-                                        <td className="p-2">{val.ngaythem}</td>
-                                        <td className="p-2">
-                                            <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
-                                            >Xóa</button>
-                                        </td>
-                                    </tr>
-                                )
-                            })
+                            // phuongtien_data.map((val,index)=> {
+                            //     const [more, setMore] = useState(false);
+                            //     return (
+                            //         <tr className="align-top hover:bg-[#68d3cc1c] text-center">
+                            //             <td className="p-2">{val.stt}</td>
+                            //             <td className="w-[150px] p-2">{val.tenpt}</td>
+                            //             <td className="p-2 ">{val.loaipt}</td>
+                            //             <td className="p-2 w-[150px]">{val.bienso}</td>
+                            //             <td className="p-2">{val.ngaythem}</td>
+                            //             <td className="p-2">
+                            //                 <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
+                            //                 >Xóa</button>
+                            //             </td>
+                            //         </tr>
+                            //     )
+                            // })
                         }
                 </table>
             </div>

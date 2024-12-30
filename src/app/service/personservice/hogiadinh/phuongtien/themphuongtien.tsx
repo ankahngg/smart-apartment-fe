@@ -1,8 +1,23 @@
+import axiosInstance from "@/utils/axiosConfig";
+import { useEffect } from "react";
+
 interface newbox {
     onShow : (show : boolean) => void
+    apartId : number
 }
 
-const Themphuongtien:React.FC<newbox> = ({onShow}) => {
+const Themphuongtien:React.FC<newbox> = ({onShow,apartId}) => {
+    useEffect(()=>{
+        // alert("here")
+        const fetchVehiType = async () => {
+            const response = await axiosInstance.get("/api/v1/vehicles/vehicle-types");
+            console.log('API Response:', response.data);  // Log the response for debugging
+            
+            
+        };
+        fetchVehiType(); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+    },[])
+
     return (  
         <div className="w-full h-full fixed z-10">
             <div className="absolute left-1/2 -translate-x-1/2 border-2 w-[400px] bg-white">

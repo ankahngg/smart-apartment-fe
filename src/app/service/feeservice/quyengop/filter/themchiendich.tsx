@@ -5,21 +5,23 @@ import axios from "axios";
 import { useState } from "react";
 import { start } from "repl";
 
-function Themchiendich() {
+interface newbox {
+    onShow : (show : boolean) => void
+}
+
+const Themchiendich:React.FC<newbox> = ({onShow})=> {
     const [name,setName] = useState('');
     const [tgbd,setTgbd] = useState('');
     const [tgkt,setTgkt] = useState('');
 
     async function hanlde() {
-        alert("click")
+        // alert("click")
         await axiosInstance.post("/api/v1/campaigns",{
             name : name,
             startDate : tgbd,
             endDate : tgkt
         })
-        
-        
-
+        onShow(false);
     }
     
     const dispatch = useAppDispatch()
@@ -28,7 +30,7 @@ function Themchiendich() {
             <div className="absolute top-[30px] left-[30px] border-2 bg-[white] w-[400px]">
                 <div className="flex justify-end">
                     <button className="bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white"
-                    onClick={()=>dispatch(globalSlice.actions.themchiendich(false))}
+                    onClick={()=>onShow(false)}
                     >X</button>
                 </div>
                 <div className="p-3">

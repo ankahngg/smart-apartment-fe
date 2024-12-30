@@ -21,7 +21,7 @@ const MonthYearPicker: React.FC<MonthYearPickerProps> = ({ setDate }) => {
                 onChange={handleChange}
                 format="YYYY-MM"
                 placeholder="CHỌN ĐỢT THU"
-                className ="p-2 text-l font-medium border-2 border-black w-full rounded-xl mb-2 "
+                className ="p-2 text-xl font-medium border-2 border-black w-full rounded-xl mb-2 "
             />
         </div>
     );

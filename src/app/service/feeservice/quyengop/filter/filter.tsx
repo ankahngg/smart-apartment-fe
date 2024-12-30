@@ -83,7 +83,7 @@ function Filter() {
                     </select>
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 ml-2">
                     <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl" >
                         <option value={'default'}>CHỌN CĂN HỘ</option>
                         {

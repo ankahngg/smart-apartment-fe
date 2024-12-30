@@ -5,18 +5,22 @@ import Phuongtien from "./phuongtien/phuongtien";
 import { useAppDispatch } from "@/redux/hooks";
 import globalSlice from "@/redux/globalSlice";
 
-function Chitiet() {
+interface newbox {
+    onShow : (show : boolean) => void,
+    apartId:number
+}
+
+const Chitiet:React.FC<newbox> = ({onShow,apartId})=> {
     const [page,setPage] = useState(0)
     const dispatch = useAppDispatch()
 
     return (
         <div className="fixed w-screen h-screen top-0 left-0">
             <div className="absolute border-2 bg-[white] top-1/2 left-1/2  -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[520px]">
-
                 <div>
                     <div className="flex justify-end">
                         <button className="bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white"
-                        onClick={()=>dispatch(globalSlice.actions.hgd_chitiet_action(false))}
+                        onClick={()=>onShow(false)}
                         >X</button>
                     </div>
                 </div>
@@ -51,8 +55,9 @@ function Chitiet() {
                     <div className="mt-2">
                     {
                         page == 0 ?
-                        <Nhankhau />:
-                        <Phuongtien />
+                        <Nhankhau apartId={apartId}/>:
+                        <></>
+                        // <Phuongtien apartId={apartId}/>
                     }
                     </div>
 

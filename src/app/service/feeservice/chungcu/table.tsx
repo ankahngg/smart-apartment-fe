@@ -11,12 +11,12 @@ interface Invoice {
     mch: string;
     hoten: string;
     dotthu: string;
-    hanthu: string;
     phish: number;
     paidAmount: number;
     state: string;
     ngaydong: string;
 }
+
 
 const Table: React.FC = () => {
     const [data, setData] = useState<Invoice[]>([]);
@@ -27,6 +27,15 @@ const Table: React.FC = () => {
     const [pageSize] = useState(10); // Số item mỗi trang
     const dispatch = useDispatch();
 
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat("en-GB", {
+          month: "2-digit",
+          year: "numeric",
+        }).format(date);
+      };
+
+      
     useEffect(() => {
         const fetchInvoices = async (page: number) => {
             try {
@@ -46,8 +55,7 @@ const Table: React.FC = () => {
                         mhd: item.invoiceCode,
                         mch: item.apartment?.code || "N/A",
                         hoten: item.apartment?.owner?.fullName || "N/A",
-                        dotthu: item.startDate?.split("T")[0] || "",
-                        hanthu: item.dueDate?.split("T")[0] || "",
+                        dotthu: formatDate(item.startDate),
                         phish: item.totalAmount || 0,
                         paidAmount: item.paidAmount || 0,
                         state: item.status || "N/A",
@@ -106,7 +114,7 @@ const Table: React.FC = () => {
                             <th className="p-2">Mã căn hộ</th>
                             <th className="p-2">Họ tên chủ hộ</th>
                             <th className="p-2">Đợt thu</th>
-                            <th className="p-2">Hạn thu</th>
+    
                             <th className="p-2">Tổng</th>
                             <th className="p-2">Đã đóng</th>
                             <th className="p-2">Trạng thái</th>
@@ -120,7 +128,6 @@ const Table: React.FC = () => {
                                 <td className="p-2 ">{val.mch}</td>
                                 <td className="p-2">{val.hoten}</td>
                                 <td className="p-2">{val.dotthu}</td>
-                                <td className="p-2">{val.hanthu}</td>
                                 <td className="p-2">{val.phish.toLocaleString("de-DE")} VNĐ</td>
                                 <td className="p-2">{val.paidAmount} VNĐ</td>
                                 <td className={`p-2 font-bold ${val.state === "Đã đóng" ? "text-green-500" : "text-red-500"}`}>
@@ -154,7 +161,8 @@ const Table: React.FC = () => {
                         onChange={handlePageChange}
                         total={totalItems}
                         pageSize={pageSize}
-                        style={{ marginTop: "16px", textAlign: "center" }}
+                        className="mt-[16px] text-center"
+                        // style={{ marginTop: "16px", textAlign: "center" }}
                     />
                 </div>
 
