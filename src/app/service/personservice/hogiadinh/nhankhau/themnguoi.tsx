@@ -46,8 +46,8 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
     },[])
     console.log(gender,role,'wtf')
     async function handleAdd() {
-        console.log(name,gender,role,cccd,dob,home,contact,job)
-        if(name=='' || cccd == '') {setWarn(true);return;}
+        let isnum = /^\d+$/.test(cccd);
+        if(name=='' || cccd == '' || dob == '' || !isnum) {setWarn(true);return;}
         
         await axiosInstance.post(`/api/v1/residents/to-apartment/${apartId}`,[
             {

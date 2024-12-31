@@ -26,14 +26,14 @@ const Lichsubd:React.FC<newbox> = ({onShow}) => {
             hoten : "Nguyen Phuc An Khang",
             vaitro : "Chủ hộ",
             ngaybd : "20-10-2024",
-            loaibd : "Thêm",
+            loaibd : "Xóa",
         },
         {
             macd : 'CD101',
             hoten : "Nguyen Phuc An Khang",
             vaitro : "Chủ hộ",
             ngaybd : "20-10-2024",
-            loaibd : "Thêm",
+            loaibd : "Xóa",
         }
     ]
     return (

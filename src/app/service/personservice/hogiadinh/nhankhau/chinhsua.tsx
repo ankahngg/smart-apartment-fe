@@ -61,13 +61,13 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
             const response = await axiosInstance.get("/api/v1/enum/household-role")
             console.log(response)
             setRoledata(response.data)
-            setRole(roledata[0].enumName)
+            
         }
         const fetchGender = async () =>{
             const response = await axiosInstance.get("/api/v1/enum/gender")
             console.log(response)
             setGenderdata(response.data)
-            setGender(genderdata[0].enumName)
+            
         }
         const fetchResi = async () => {
             const response = await axiosInstance.get(`/api/v1/residents/${resiId}`, {
@@ -81,8 +81,8 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
                 setContact(item.contact||"");
                 setDob(item.dateOfBirth||"");
                 setHome(item.homeTown||"");
-                setRole(item.householdRole||"");
-                setGender(item.gender||"")
+                setRole(item.householdRole.enumName||"");
+                setGender(item.gender.enumName||"")
                 setJob(item.job||"");
             } else {
                 setData(init); // Update state with an empty array if no data is available
@@ -93,21 +93,25 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
         fetchResi()
         
     },[])
-    async function handleAdd() {
-        // console.log(name,gender,role,cccd,dob,home,contact,job)
-        // if(name=='' || cccd == '') {setWarn(true);return;}
+    async function handleChange() {
+        console.log(name,gender,role,cccd,dob,home,contact,job)
+        let isnum = /^\d+$/.test(cccd);
+        if(name=='' || cccd == '' || !isnum || dob=='') {setWarn(true);return;}
+        // console.log()
         
-        // await axiosInstance.post(`/api/v1/residents/to-apartment/${apartId}`,[
-        //     {
-        //         fullName: name,
-        //         dateOfBirth: dob,
-        //         identityCardNumber: cccd,
-        //         contact: contact,
-        //         gender: gender,
-        //         currentLivingType: "THUONG_TRU",
-        //         householdRole: role,
-        // }])
-        // onShow(false)
+        await axiosInstance.put(`/api/v1/residents/${resiId}`,
+            {
+                fullName: name,
+                dateOfBirth: dob,
+                identityCardNumber: cccd,
+                contact: contact,
+                gender: gender,
+                hometown:home,
+                job :job,
+                currentLivingType: "THUONG_TRU",
+                householdRole: role,
+        })
+        onShow(false)
         
     }
 
@@ -199,7 +203,7 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
                     {/* row4 */}
                     <div className="mt-5 flex justify-center">
                         <button className="p-2 rounded-xl bg-[#1e83a5] hover:bg-[#176b87] text-white"
-                        onClick={()=>handleAdd()}
+                        onClick={()=>handleChange()}
                         >CHỈNH SỬA</button>
                     </div>
                 </div>

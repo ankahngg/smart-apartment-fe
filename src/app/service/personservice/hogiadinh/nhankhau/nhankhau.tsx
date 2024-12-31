@@ -9,6 +9,7 @@ import type { PaginationProps } from "antd";
 
 interface newbox {
     apartId:number
+    reload:boolean
 }
 interface nhankhau {
     stt : number,
@@ -24,7 +25,16 @@ interface nhankhau {
     vaitro : string
 }
 
-const Nhankhau:React.FC<newbox> = ({apartId}) => {
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
+
+const Nhankhau:React.FC<newbox> = ({apartId,reload}) => {
     const [data,setData] = useState<nhankhau[]>([])
     const [pageSize,setPageSize] = useState(5); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,21 +60,20 @@ const Nhankhau:React.FC<newbox> = ({apartId}) => {
                 ]
             });
             console.log('API Response:', response.data);  // Log the response for debugging
-            const tmp = new Array(response.data.content.size).fill(false)
             if (response.data && response.data.content) {
                 const fetchedData = response.data.content.map( (item: any, index: number) => {
                         return {
                             stt : (page-1)*pageSize+index+1,
                             macd : item.residentId,
                             hoten :item.fullName,
-                            gioitinh : item.gender.name||"Chưa có",
-                            ngaysinh : item.dateOfBirth||"Chưa có",
-                            cccd : item.identityCardNumber||"Chưa có",
-                            quequan : item.hometown||"Chưa có",
-                            nghenghiep : item.job||"Chưa có",
-                            lienhe : item.contact||"Chưa có",
-                            trangthai : item.currentLivingType.name||"Chưa có",
-                            vaitro : item.householdRole.name||"Chưa có",
+                            gioitinh : item.gender.name||"",
+                            ngaysinh : item.dateOfBirth.split('-').reverse().join('/'),
+                            cccd : item.identityCardNumber||"",
+                            quequan : item.hometown||"",
+                            nghenghiep : item.job||"",
+                            lienhe : item.contact||"",
+                            trangthai : item.currentLivingType.name||"",
+                            vaitro : item.householdRole.name||"",
                         };
                     })
                 
@@ -79,7 +88,7 @@ const Nhankhau:React.FC<newbox> = ({apartId}) => {
             
         };
         fetchApart(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    },[currentPage, pageSize,add,chitiet])
+    },[currentPage, pageSize,add,chitiet,reload])
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
             setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -90,7 +99,7 @@ const Nhankhau:React.FC<newbox> = ({apartId}) => {
     const endItem = Math.min(currentPage * pageSize, totalItems);
 
     return (
-        <div>
+        <div >
             {
                 add ?
                 <Themnguoi onShow={setAdd} apartId={apartId} />
@@ -170,7 +179,7 @@ const Nhankhau:React.FC<newbox> = ({apartId}) => {
                     onChange={handlePageChange}
                     total={totalItems}
                     pageSize={pageSize}
-                    className="mt-[16px] text-center"
+                    className="mt-[5px] text-center"
                     // style={{ marginTop: "16px", textAlign: "center" }}
                 />
             </div>

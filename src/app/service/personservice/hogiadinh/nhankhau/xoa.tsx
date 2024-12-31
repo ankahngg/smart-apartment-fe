@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
+    onShow2 : (show : boolean) => void,
     resId : string;
 }
 
@@ -14,7 +15,7 @@ interface role {
 
  
 
-const Xoa:React.FC<newbox> =({onShow,resId}) => {
+const Xoa:React.FC<newbox> =({onShow,onShow2,resId}) => {
     const [name,setName] = useState('')
     
     useEffect(()=>{
@@ -30,6 +31,7 @@ const Xoa:React.FC<newbox> =({onShow,resId}) => {
     async function handleDel() {
         await axiosInstance.get(`/api/v1/residents/remove-from-apartment/${resId}`)
         onShow(false)
+        onShow2(false)
     }
 
     return (

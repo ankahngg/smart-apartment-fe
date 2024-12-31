@@ -27,6 +27,8 @@ function Table() {
     const [totalItems, setTotalItems] = useState(0);
     const [chitiet,setChitiet] = useState(false);
     const [id,setId] = useState(0);
+    const [apartcode,setApartcode] = useState('');
+    const [apartowner,setApartowner] = useState('');
 
     useEffect(()=>{
         const fetchApart = async (page: number) => {
@@ -43,7 +45,6 @@ function Table() {
                             stt: index,
                             mach: item.code,
                              hoten: item.owner? item.owner.fullName : "Chưa có",
-                            // hoten : "vc",
                             dientich: item.area,
                             soluong: item.residents.length || 0,
                             phuongtien: item.vehicleCount || 0,
@@ -60,7 +61,7 @@ function Table() {
             
         };
         fetchApart(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    },[currentPage, pageSize])
+    },[currentPage, pageSize,chitiet])
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
         setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -69,12 +70,13 @@ function Table() {
     // Tính toán chỉ số bản ghi đầu tiên và cuối cùng
     const startItem = (currentPage - 1) * pageSize + 1;
     const endItem = Math.min(currentPage * pageSize, totalItems);
+    
 
     return (
     <div className="w-full p-4 border-black border-2 h-[700px]">
         {
             chitiet?
-            <Chitiet onShow={setChitiet} apartId={id}/>
+            <Chitiet onShow={setChitiet} apartId={id} apartCode={apartcode} apartOwner = {apartowner}/>
             :
             <></>
         }
@@ -110,15 +112,15 @@ function Table() {
                     //const [more, setMore] = useState(false);
                     return (
                         <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
-                            <td className="p-1">{val.stt}</td>
-                            <td className="p-1">{val.mach}</td>
-                            <td className="p-1 w-[200px]">{val.hoten}</td>
-                            <td className="p-1">{val.dientich}</td>
-                            <td className="p-1">{val.soluong}</td>
-                            <td className="p-1">{val.phuongtien}</td>
-                            <td className="p-1">
+                            <td className="p-2">{val.stt}</td>
+                            <td className="p-2">{val.mach}</td>
+                            <td className="p-2 w-[200px]">{val.hoten}</td>
+                            <td className="p-2">{val.dientich}</td>
+                            <td className="p-2">{val.soluong}</td>
+                            <td className="p-2">{val.phuongtien}</td>
+                            <td className="p-2">
                                 <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white "
-                                onClick={()=>{setId(val.id),setChitiet(true)}}
+                                onClick={()=>{setApartcode(val.mach),setApartowner(val.hoten),setId(val.id),setChitiet(true)}}
                                 >Xem chi tiết</button>
                             </td>
                         </tr>
