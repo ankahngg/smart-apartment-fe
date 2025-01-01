@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    resId:string
+    crLog:changelog
 }
 
 interface changetype {
@@ -11,35 +11,45 @@ interface changetype {
     name:string,
     enumName:string,
 }
+interface changelog{
+    stt : number,
+    id : number,
+    trangthai:string,
+    ngay: string,
+    ghichu: string,
+    enumName:string,
+}
 
  
 
-const Chinhsuacutru:React.FC<newbox> =({onShow,resId}) => {
+const Chinhsuacutru:React.FC<newbox> =({onShow,crLog}) => {
     const [changetype,setChangetype] = useState<changetype[]>([]);
     const [changetypechoose,setChangetypechoose] = useState('')
-    const [notekb,setNotekb] = useState('');
+    const [note,setNote] = useState('');
     const [changedate,setChangedate] = useState('');
     useEffect(()=>{
         const fetchChangeType = async() => {
             const response = await axiosInstance.get("/api/v1/enum/living-type");
             setChangetype(response.data)
-            setChangetypechoose(response.data[0].enumName)
         }
         fetchChangeType()
+        setChangetypechoose(crLog.enumName),
+        setNote(crLog.ghichu)
+        setChangedate(crLog.ngay.split('/').reverse().join('-'))
     },[])
-    
     async function handleChinhsua(){
         if(changedate=='') {alert("Không được để trống ngày"); return;}
-        await axiosInstance.post(`/api/v1/residents/change-living-type?residentId=${resId}`,{
+        await axiosInstance.put(`/api/v1/residents/change-logs/${crLog.id}`,{
             newLivingType:changetypechoose,
-            notes:notekb,
+            notes:note,
             changeDate : changedate
         })
         onShow(false)
     }
 
-    function handleDel() {
-
+    async function handleDel() {
+        await axiosInstance.delete(`/api/v1/residents/change-logs/${crLog.id}`)
+        onShow(false)
     }
 
     return (
@@ -73,7 +83,7 @@ const Chinhsuacutru:React.FC<newbox> =({onShow,resId}) => {
                 </div>
                 <div>
                     <div>Ghi chú</div>
-                    <input type="text" className='border-2 border-black p-2 w-full' value={notekb} onChange={(e)=>setNotekb(e.target.value)} />
+                    <input type="text" className='border-2 border-black p-2 w-full' value={note} onChange={(e)=>setNote(e.target.value)} />
                 </div>
                 <div className='mt-4'>
                     <button className='bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white rounded-xl'

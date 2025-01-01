@@ -5,9 +5,8 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Pagination } from "antd";
 import type { PaginationProps } from "antd";
-import Xemchitiet from "./nhankhau/xemchitiet";
-import Nhankhau from "./nhankhau/nhankhau";
 import Chitiet from "./chitiet";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 
 interface Canho{
     id : number,
@@ -20,15 +19,13 @@ interface Canho{
 }
 
 function Table() {
+    const dispatch = useAppDispatch()
     //const col:string[] = ['STT','Mã hóa đơn','Mã căn hộ','Họ tên chủ hộ',,'Đợt thu','Phí quản lí','Phí dịch vụ','Trạng thái','Ngày đóng','Xóa']
     const [data, setData] = useState<Canho[]>([]);
     const [pageSize,setPageSize] = useState(10); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [chitiet,setChitiet] = useState(false);
-    const [id,setId] = useState(0);
-    const [apartcode,setApartcode] = useState('');
-    const [apartowner,setApartowner] = useState('');
 
     useEffect(()=>{
         const fetchApart = async (page: number) => {
@@ -39,12 +36,19 @@ function Table() {
             console.log('API Response:', response.data);  // Log the response for debugging
             // const tmp = new Array(response.data.content.size).fill(false)
             if (response.data && response.data.content) {
+                
                 const fetchedData = response.data.content.map( (item: any, index: number) => {
+                        var ht = 'Chưa có';
+                        if(item.residents.length == 0) ht = 'Chưa có';
+                        else {
+                            for (const val of item.residents ) 
+                                if(val.householdRole.name == "Chủ hộ") ht = val.fullName
+                        }
                         return {
                             id : item.apartmentId,
                             stt: index,
                             mach: item.code,
-                             hoten: item.owner? item.owner.fullName : "Chưa có",
+                            hoten: ht,
                             dientich: item.area,
                             soluong: item.residents.length || 0,
                             phuongtien: item.vehicleCount || 0,
@@ -63,6 +67,7 @@ function Table() {
         fetchApart(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
     },[currentPage, pageSize,chitiet])
 
+
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
         setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
     };
@@ -76,7 +81,7 @@ function Table() {
     <div className="w-full p-4 border-black border-2 h-[700px]">
         {
             chitiet?
-            <Chitiet onShow={setChitiet} apartId={id} apartCode={apartcode} apartOwner = {apartowner}/>
+            <Chitiet onShow={setChitiet}/>
             :
             <></>
         }
@@ -120,7 +125,7 @@ function Table() {
                             <td className="p-2">{val.phuongtien}</td>
                             <td className="p-2">
                                 <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white "
-                                onClick={()=>{setApartcode(val.mach),setApartowner(val.hoten),setId(val.id),setChitiet(true)}}
+                                onClick={()=>{dispatch(globalSlice.actions.set_cr_apart(val)),setChitiet(true)}}
                                 >Xem chi tiết</button>
                             </td>
                         </tr>

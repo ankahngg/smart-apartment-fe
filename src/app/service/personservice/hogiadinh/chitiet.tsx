@@ -2,23 +2,19 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import Nhankhau from "./nhankhau/nhankhau";
 import Phuongtien from "./phuongtien/phuongtien";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import globalSlice from "@/redux/globalSlice";
 import axiosInstance from "@/utils/axiosConfig";
 import Xoacanho from "./xoacanho";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    apartId:number
-    apartCode:string,
-    apartOwner:string
 }
 
-const Chitiet:React.FC<newbox> = ({onShow,apartId,apartCode,apartOwner})=> {
+const Chitiet:React.FC<newbox> = ({onShow})=> {
+    const cr_apart = useAppSelector(state =>state.global.cr_apart);
     const [page,setPage] = useState(0)
     const [xoacanho,setXoacanho] = useState(false)
-
-    useEffect(()=>{},[xoacanho])
 
     function handleDel() {
         setXoacanho(true);
@@ -28,7 +24,7 @@ const Chitiet:React.FC<newbox> = ({onShow,apartId,apartCode,apartOwner})=> {
         <div className="fixed w-screen h-screen top-0 left-0">
             {
                 xoacanho?
-                <Xoacanho onShow={setXoacanho} apartId={apartId} apartCode={apartCode}/>
+                <Xoacanho onShow={setXoacanho} onShow2={onShow}/>
                 :
                 <></>
             }
@@ -46,8 +42,8 @@ const Chitiet:React.FC<newbox> = ({onShow,apartId,apartCode,apartOwner})=> {
                     
                     <div className="flex items-end">
                         <div className="text-2xl">Mã căn hộ</div>
-                        <div className="font-bold ml-2 text-2xl">{apartCode} </div>
-                        <div className="font-bold ml-2 text-xl italic">- {apartOwner}</div>
+                        <div className="font-bold ml-2 text-2xl">{cr_apart.mach} </div>
+                        <div className="font-bold ml-2 text-xl italic">- {cr_apart.hoten}</div>
                     </div>
                     {/* row2 */}
 
@@ -74,8 +70,8 @@ const Chitiet:React.FC<newbox> = ({onShow,apartId,apartCode,apartOwner})=> {
                         <div className="mt-2">
                             {
                                 page == 0 ?
-                                <Nhankhau apartId={apartId} reload={xoacanho}/>:
-                                <Phuongtien apartId={apartId} reload={xoacanho}/>
+                                <Nhankhau />:
+                                <Phuongtien />
                             }
                         </div>
                         

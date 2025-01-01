@@ -4,6 +4,8 @@ import Lichsubd from "../nhankhau/lichsubd";
 import axiosInstance from "@/utils/axiosConfig";
 import { Pagination } from "antd";
 import type { PaginationProps } from "antd";
+import Chinhsuaptien from "./chinhsuaptien";
+import { useAppSelector } from "@/redux/hooks";
 
 interface phuongtien {
     stt : number,
@@ -11,22 +13,33 @@ interface phuongtien {
     ten : string,
     loai : string,
     bienso:string,
-    ngay:string
+    ngay:string,
+    typeid:string,
 }
 interface newbox {
-    apartId:number
-    reload:boolean
+    
 }
 
-const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
+
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
+
+
+const Phuongtien:React.FC<newbox> =()=> {
+    const cr_apart = useAppSelector((state) =>state.global.cr_apart)
     const [data,setData] = useState<phuongtien[]>([])
+    const [crPtien,setCrPtien] = useState<phuongtien>()
     const [pageSize,setPageSize] = useState(5); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
-    const maxpage = 6;
+    const [edit,setEdit] = useState(false);
     const [add,setAdd] = useState(false);
-    const [chitiet,setChitiet] = useState(false);
-    const [resid,setResid] = useState('');
     useEffect(()=>{
         // alert("here")
         const fetchVehi = async (page: number) => {
@@ -36,7 +49,7 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
                 filters : [
                     {
                         name : "apartmentId",
-                        value : apartId,
+                        value : cr_apart.id,
                         operation : "eq"
                     }
                 ]
@@ -50,7 +63,8 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
                             ten : item.name||"",
                             bienso: item.licensePlate||"",
                             loai : item.vehicleTypeName||"",
-                            ngay : item.registerDate||""
+                            ngay : formatDate(item.registerDate)||"",
+                            typeid:item.vehicleTypeId
                         };
                     })
                 
@@ -64,7 +78,7 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
             
         };
         fetchVehi(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    },[currentPage, pageSize,add,reload])
+    },[currentPage, pageSize,add,edit])
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
                 setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -77,7 +91,12 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
         <div>
             {
                 add ?
-                <Themphuongtien onShow={setAdd} apartId={apartId}/>:
+                <Themphuongtien onShow={setAdd} />:
+                <></>
+            }
+            {
+                edit ?
+                <Chinhsuaptien onShow={setEdit} crPtien={crPtien}/>:
                 <></>
             }
            
@@ -94,7 +113,7 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
                         <th className="p-2">Loại phương tiện</th>
                         <th className="p-2">Biển số</th>
                         <th className="p-2">Ngày thêm</th>
-                        <th className="p-2">Xóa</th>
+                        <th className="p-2">Hành động</th>
                     </tr>
                         {
                             data.map((val,index)=> {
@@ -102,11 +121,17 @@ const Phuongtien:React.FC<newbox> =({apartId,reload})=> {
                                     <tr className="align-top hover:bg-[#68d3cc1c] text-center">
                                         <td className="p-2">{val.stt}</td>
                                         <td className="w-[150px] p-2">{val.ten}</td>
-                                        <td className="p-2 ">{val.loai}</td>
+                                        <td className="p-2 ">{
+                                            val.loai =="PARKING_CAR" ? "Ô tô" :
+                                            val.loai =="PARKING_MOTORCYCLE" ? "Xe máy" :
+                                            val.loai =="PARKING_BICYCLE" ? "Xe đạp" :
+                                            "Khác"
+                                        }</td>
                                         <td className="p-2 w-[150px]">{val.bienso}</td>
                                         <td className="p-2">{val.ngay}</td>
                                         <td className="p-2">
                                             <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white"
+                                            onClick={()=>{setCrPtien(val),setEdit(true)}}
                                             >Chỉnh sửa</button>
                                         </td>
                                     </tr>

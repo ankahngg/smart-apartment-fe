@@ -1,9 +1,10 @@
+import { useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    apartId : number;
+    cnt:number,
 }
 
 interface role {
@@ -14,7 +15,8 @@ interface role {
 
  
 
-const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
+const Themnguoi:React.FC<newbox> =({onShow,cnt}) => {
+    const cr_apart = useAppSelector(state=>state.global.cr_apart)
     const [roledata,setRoledata] = useState<role[]>([])
     const [genderdata,setGenderdata] = useState<role[]>([])
     const [name,setName] = useState('');
@@ -32,7 +34,8 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
             const response = await axiosInstance.get("/api/v1/enum/household-role")
             console.log(response)
             setRoledata(response.data)
-            setRole(roledata[0].enumName)
+            if(cnt == 0)
+            setRole("OWNER")
         }
         const fetchGender = async () =>{
             const response = await axiosInstance.get("/api/v1/enum/gender")
@@ -44,12 +47,11 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
         fetchRole()
         
     },[])
-    console.log(gender,role,'wtf')
     async function handleAdd() {
         let isnum = /^\d+$/.test(cccd);
         if(name=='' || cccd == '' || dob == '' || !isnum) {setWarn(true);return;}
         
-        await axiosInstance.post(`/api/v1/residents/to-apartment/${apartId}`,[
+        await axiosInstance.post(`/api/v1/residents/to-apartment/${cr_apart.id}`,[
             {
                 fullName: name,
                 dateOfBirth: dob,
@@ -58,6 +60,8 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
                 gender: gender,
                 currentLivingType: "THUONG_TRU",
                 householdRole: role,
+                job: job,
+                hometown: home,
         }])
         onShow(false)
         
@@ -77,11 +81,11 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
                     <div className="flex items-top justify-between">
                         <div className="w-">
                             <div>Họ và tên</div>
-                            <input type="text" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setName(e.target.value)}/>
+                            <input type="text" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setName(e.target.value)} value={name}/>
                         </div>
                         <div>
                             <div>Giới tính</div>
-                            <select className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setGender(e.target.value)}>
+                            <select className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setGender(e.target.value)} value={gender}>
                             {
                                 genderdata.map((val,index)=>{
                                     if(index < 2) return (
@@ -96,16 +100,27 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
                         </div>
                         <div>
                             <div>Vai trò</div>
-                            <select className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setRole(e.target.value)}>
+                            <select className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setRole(e.target.value)} value={role}>
                             {
-                                
+                                cnt ?
                                 roledata.map((val,index)=>{
+                                    if(val.name != "Chủ hộ")
                                     return (
                                         <option value={val.enumName}>
                                             {val.name}
                                         </option>
                                     )
                                 })
+                                :
+                                roledata.map((val,index)=>{
+                                    if(val.name=="Chủ hộ")
+                                    return (
+                                        <option value={val.enumName}>
+                                            {val.name}
+                                        </option>
+                                    )
+                                })
+
                                
                             }
                             </select>
@@ -117,26 +132,26 @@ const Themnguoi:React.FC<newbox> =({onShow,apartId}) => {
                     <div className="flex justify-between">
                         <div>
                             <div>Mã số cccd</div>
-                            <input type="string" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setCccd(e.target.value)}/>
+                            <input type="string" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setCccd(e.target.value)} value={cccd}/>
                         </div>
                         <div>
                             <div>Ngày sinh</div>
-                            <input type="date" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setDob(e.target.value)}/>
+                            <input type="date" className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setDob(e.target.value)} value={dob}/>
                         </div>
                     </div>
                     {/* row3 */}
                     <div className="flex justify-between">
                         <div>
                             <div>Quê quán</div>
-                            <input type="string" className="border-2 p-2 border-black rounded-xl w-[150px]" onChange={(e)=>setHome(e.target.value)}/>
+                            <input type="string" className="border-2 p-2 border-black rounded-xl w-[150px]" onChange={(e)=>setHome(e.target.value)} value={home}/>
                         </div>
                         <div>
                             <div>Liên hệ</div>
-                            <input type="string" className="border-2 p-2 border-black rounded-xl  w-[150px]" onChange={(e)=>setContact(e.target.value)}/>
+                            <input type="string" className="border-2 p-2 border-black rounded-xl  w-[150px]" onChange={(e)=>setContact(e.target.value)} value={contact}/>
                         </div>
                         <div>
                             <div>Nghề nghiệp</div>
-                            <input type="string" className="border-2 p-2 border-black rounded-xl  w-[150px]" onChange={(e)=>setJob(e.target.value)}/>
+                            <input type="string" className="border-2 p-2 border-black rounded-xl  w-[150px]" onChange={(e)=>setJob(e.target.value)} value={job}/>
                         </div>
                     </div>
                     {/* warning */}

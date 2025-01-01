@@ -3,11 +3,13 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Chinhsua from './chinhsua';
 import Xoa from './xoa';
-import Lichsucutru from './lichsucutru';
+import Khaibao from './khaibao';
+import Chinhsuacutru from './chinhsuacutru';
+import { useAppSelector } from '@/redux/hooks';
 interface newbox {
     onShow : (show : boolean) => void
-    resId : string
 }
+
 
 interface nhankhau {
     stt : number,
@@ -24,68 +26,118 @@ interface nhankhau {
 }
 
 
-const init:nhankhau = {
-    stt : 0,
-    macd : "",
-    hoten :"",
-    gioitinh : "",
-    ngaysinh : "",
-    cccd : "",
-    quequan : "",
-    nghenghiep : "",
-    lienhe : "",
-    trangthai : "",
-    vaitro : ""
+interface changelog{
+    stt : number,
+    id : number,
+    trangthai:string,
+    ngay: string,
+    ghichu: string,
+    enumName:string,
 }
 
 
-const Xemchitiet:React.FC<newbox> = ({onShow,resId}) =>{
-    const [data,setData] = useState<nhankhau>(init)
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
+
+const Xemchitiet:React.FC<newbox> = ({onShow}) =>{
+    const cr_apart = useAppSelector((state) => state.global.cr_apart)
+    const cr_res = useAppSelector((state) => state.global.cr_res)
+    const [logdata,setLogdata] = useState<changelog[]>([])
+    const [data,setData] = useState<nhankhau>(cr_res)
+    const [kbao,setKbao] = useState(false)
+    const [csua,setCsua] = useState(false)
     const [change,setChange] = useState(false);
     const [del,setDel] = useState(false);
+    const [focus,setFocus] = useState(-1)
+    const [crLog,setCrLog] = useState<changelog>()
+    if(!csua && focus != -1) setFocus(-1);
     useEffect(()=>{
-        const fetchResi = async () => {
-            const response = await axiosInstance.get(`/api/v1/residents/${resId}`, {
+
+        const fetchChangelog = async () =>{
+
+            // get-change-log
+            const response = await axiosInstance.post("/api/v1/residents/change-log/search",{
+                pageSize:999,
+                filters: [
+                    {
+                        name:"residentId",
+                        value:cr_res.macd,
+                        operation:"eq",   
+                    }
+                ],
+                sorts: [
+                    {
+                        property: "changeDate",
+                        direction: "desc"
+                    },
+                ]
             });
-            console.log('API Response:', response.data);  // Log the response for debugging
-            // const tmp = new Array(response.data.content.size).fill(false)
-            if (response.data ) {
-                var item = response.data;
-                const fetchedData =  
-                {
-                    stt : 0,
-                    macd : item.residentId||"",
-                    hoten :item.fullName||"",
-                    gioitinh : item.gender.name||"",
-                    ngaysinh : item.dateOfBirth.split('-').reverse().join('/')||"",
-                    cccd : item.identityCardNumber||"",
-                    quequan : item.homeTown||"",
-                    nghenghiep : item.job||"",
-                    lienhe : item.contact||"",
-                    trangthai : item.currentLivingType.name||"",
-                    vaitro : item.householdRole.name||"",
-                };
-                setData(fetchedData); // Update state with the resolved data
-                console.log("Fetched Data:", fetchedData); // Log fetched data for debugging
-            } else {
-                onShow(false);
-                setData(init); // Update state with an empty array if no data is available
+
+            console.log('changelog Response:', response.data);
+            if(response.data) {
+                const fetchedData = response.data.content.map((item:any,index:any) =>{
+                    return {
+                        stt : index+1,
+                        trangthai:item.changeType.name,
+                        ngay:formatDate(item.changeDate),
+                        ghichu:item.notes,
+                        id : item.id,
+                        enumName : item.changeType.enumName,
+                    }
+                })
+                console.log('fetchedData_changelog: ',fetchedData)
+                setLogdata(fetchedData);
             }
-        };
-        fetchResi(); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    },[change])
+            else setLogdata([])
+
+
+            //get resident
+            const response2 = await axiosInstance.get(`/api/v1/residents/${cr_res.macd}`);
+            console.log('API Response:', response2.data);  // Log the response for debugging
+            var tt = '';
+            if(response.data.content.length == 0) tt ='Thường trú';
+            else tt = response.data.content[0].changeType.name
+           
+            var item = response2.data;
+            const fetchedData =  
+            {
+                stt : 0,
+                macd : item.residentId||"",
+                hoten :item.fullName||"",
+                gioitinh : item.gender.name||"",
+                ngaysinh : item.dateOfBirth.split('-').reverse().join('/')||"",
+                cccd : item.identityCardNumber||"",
+                quequan : item.homeTown||"",
+                nghenghiep : item.job||"",
+                lienhe : item.contact||"",
+                trangthai : tt,
+                vaitro : item.householdRole.name||"",
+            };
+            setData(fetchedData); // Update state with the resolved data
+            console.log("Fetched Data:", fetchedData); // Log fetched data for debugging
+        }
+        fetchChangelog()
+        // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+
+    },[change,kbao,csua])
     
     return (
         <div className="w-full h-full fixed z-10">
             {
                 change?
-                <Chinhsua onShow={setChange} resiId={resId}/>
+                <Chinhsua onShow={setChange} />
                 :
                 <></>
             }
             {
                 del?
-                <Xoa onShow={setDel} resId={resId} onShow2={onShow}/>
+                <Xoa onShow={setDel} onShow2={onShow}/>
                 :
                 <></>
             }
@@ -174,9 +226,67 @@ const Xemchitiet:React.FC<newbox> = ({onShow,resId}) =>{
                     </div>
                 </div>
 
-                <Lichsucutru resId={resId}/>
-
+                <div className="pl-4">
+                    <div className=' flex items-center'>
+                        <div className='font-bold text-lg pt-2 pb-2 mr-4' >
+                            LỊCH SỬ CƯ TRÚ
+                        </div>
+                        <div>
+                            <button className='bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white rounded-xl'
+                            onClick={()=>{setCsua(false),setKbao(true)}}
+                            >KHAI BÁO</button>
+                        </div>
+                    </div>
+                    <div className='flex'>
+                        <div className='h-[200px] w-[550px] overflow-auto pr-2'>
+                            <table className="w-full">
+                                <tr className='text-center border-b-2 border-b-black sticky top-0 bg-white text-sm'>
+                                    <th className='w-[10px]'>STT</th>
+                                    <th className='p-2'>Trạng thái</th>
+                                    <th className='p-2'>Ngày khai báo</th>
+                                    <th className='p-2 w-[150px]'>Ghi chú</th>
+                                    <th className='p-2'>Hành động</th>
+                                </tr>
+                                {
+                                    
+                                    logdata.map((val,index) =>{
+                                        return (
+                                        <tr className={`text-center text-sm ${index != focus ? 'hover:bg-[#68d3cc1c]':'bg-[#68d3cc1c]'} `}>
+                                            <td className='p-2'>{val.stt}</td>
+                                            <td className='p-2'>{val.trangthai}</td>
+                                            <td className='p-2'>{val.ngay}</td>
+                                            <td className='p-2'>{val.ghichu} </td>
+                                            <td className='p-2'>
+                                                <button className='bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white rounded-xl' 
+                                                onClick={()=>{setKbao(false),setCsua(true),setFocus(index),setCrLog(val)
+                                                 }}
+                                                >Chỉnh sửa</button>
+                                            </td>
+                                        </tr>
+                                        )
+                                    })
+                                }
+                                
+                                
+                            </table>
+                        </div>
+                        {
+                            kbao?
+                            <Khaibao onShow={setKbao} />
+                            :
+                            <></>
+                        }
+                        {
+                            csua ?
+                            <Chinhsuacutru onShow={setCsua} crLog = {crLog}/>
+                            :
+                            <></>
+                        }
+               
+                    
                 
+                    </div>
+                </div>
             </div>
         </div>
     );

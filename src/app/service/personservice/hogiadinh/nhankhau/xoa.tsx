@@ -1,10 +1,10 @@
+import { useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
     onShow2 : (show : boolean) => void,
-    resId : string;
 }
 
 interface role {
@@ -15,12 +15,13 @@ interface role {
 
  
 
-const Xoa:React.FC<newbox> =({onShow,onShow2,resId}) => {
+const Xoa:React.FC<newbox> =({onShow,onShow2}) => {
+    const cr_res = useAppSelector((state) =>state.global.cr_res)
     const [name,setName] = useState('')
     
     useEffect(()=>{
         const fetchResi = async () => {
-            const response = await axiosInstance.get(`/api/v1/residents/${resId}`, {
+            const response = await axiosInstance.get(`/api/v1/residents/${cr_res.macd}`, {
             });
             setName(response.data.fullName)
         };
@@ -29,7 +30,7 @@ const Xoa:React.FC<newbox> =({onShow,onShow2,resId}) => {
     },[])
 
     async function handleDel() {
-        await axiosInstance.get(`/api/v1/residents/remove-from-apartment/${resId}`)
+        await axiosInstance.get(`/api/v1/residents/remove-from-apartment/${cr_res.macd}`)
         onShow(false)
         onShow2(false)
     }

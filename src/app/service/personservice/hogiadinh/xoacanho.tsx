@@ -1,16 +1,19 @@
+import globalSlice from "@/redux/globalSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    apartId : number,
-    apartCode:string,
+    onShow2 : (show : boolean) => void,
 }
 
 
  
 
-const Xoacanho:React.FC<newbox> =({onShow,apartId,apartCode}) => {
+const Xoacanho:React.FC<newbox> =({onShow,onShow2}) => {
+    const cr_apart = useAppSelector(state => state.global.cr_apart)
+    const dispatch = useAppDispatch()
     const [resiId,setResiId] = useState([])
     const [vehiId,setVehiId] = useState([])
     useEffect(()=>{
@@ -20,7 +23,7 @@ const Xoacanho:React.FC<newbox> =({onShow,apartId,apartCode}) => {
                 filters : [
                     {
                         name : "apartmentId",
-                        value : apartId,
+                        value : cr_apart.id,
                         operation : "eq"
                     }
                 ]
@@ -44,7 +47,7 @@ const Xoacanho:React.FC<newbox> =({onShow,apartId,apartCode}) => {
                 filters : [
                     {
                         name : "apartmentId",
-                        value : apartId,
+                        value : cr_apart.id,
                         operation : "eq"
                     }
                 ]
@@ -68,13 +71,12 @@ const Xoacanho:React.FC<newbox> =({onShow,apartId,apartCode}) => {
     },[])
 
     async function handleDel() {
-        resiId.forEach(async (val,index) =>{
-            await axiosInstance.get(`/api/v1/residents/remove-from-apartment/${val}`)
-        })
-        vehiId.forEach(async (val,index) =>{
-            await axiosInstance.delete(`/api/v1/vehicles/${val}`)
-        })
-
+        for (const item of resiId)
+            await axiosInstance.get(`/api/v1/residents/remove-from-apartment/${item}`)
+        for(const item of vehiId) 
+            await axiosInstance.delete(`/api/v1/vehicles/${item}`)
+        
+        onShow2(false)
         onShow(false)
     }
 
@@ -88,7 +90,7 @@ const Xoacanho:React.FC<newbox> =({onShow,apartId,apartCode}) => {
                 </div>
                 <div className="text-center">
                     <div className="text-xl font-bold">Xác nhận xóa căn hộ</div>
-                    <div>{apartCode}</div>
+                    <div>{cr_apart.mach}</div>
                 </div>
                 <div className="flex justify-center p-2">
                     <button className="bg-red-600 hover:bg-red-700 p-1 text-white rounded-xl" onClick={()=>handleDel()}>XÁC NHẬN</button>

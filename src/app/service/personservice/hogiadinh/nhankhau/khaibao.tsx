@@ -1,9 +1,9 @@
+import { useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    resId:string
 }
 
 interface changetype {
@@ -14,7 +14,8 @@ interface changetype {
 
  
 
-const Khaibao:React.FC<newbox> =({onShow,resId}) => {
+const Khaibao:React.FC<newbox> =({onShow}) => {
+    const cr_res = useAppSelector((state) =>state.global.cr_res)
     const [changetype,setChangetype] = useState<changetype[]>([]);
     const [changetypechoose,setChangetypechoose] = useState('')
     const [notekb,setNotekb] = useState('');
@@ -30,7 +31,7 @@ const Khaibao:React.FC<newbox> =({onShow,resId}) => {
     
     async function handleKhaibao(){
         if(changedate=='') {alert("Không được để trống ngày"); return;}
-        await axiosInstance.post(`/api/v1/residents/change-living-type?residentId=${resId}`,{
+        await axiosInstance.post(`/api/v1/residents/change-living-type?residentId=${cr_res.macd}`,{
             newLivingType:changetypechoose,
             notes:notekb,
             changeDate : changedate

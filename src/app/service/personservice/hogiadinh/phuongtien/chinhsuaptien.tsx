@@ -3,7 +3,8 @@ import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
-    onShow : (show : boolean) => void
+    onShow : (show : boolean) => void,
+    crPtien : phuongtien,
 }
 interface ptientype{
     vehicleTypeId: number,
@@ -11,8 +12,17 @@ interface ptientype{
     unitPrice: number,
 }
 
-const Themphuongtien:React.FC<newbox> = ({onShow}) => {
-    const cr_apart = useAppSelector((state) =>state.global.cr_apart)
+interface phuongtien {
+    stt : number,
+    mapt:number,
+    ten : string,
+    loai : string,
+    bienso:string,
+    ngay:string,
+    typeid:string,
+}
+const Chinhsuaptien:React.FC<newbox> = ({onShow,crPtien}) => {
+    const cr_apart = useAppSelector(state=>state.global.cr_apart)
     const [vehitype,setVehitype] = useState<ptientype[]>([])
     const [name,setName] = useState('');
     const [date,setDate] = useState('');
@@ -20,25 +30,32 @@ const Themphuongtien:React.FC<newbox> = ({onShow}) => {
     const [vehitypeid,setVehitypeid] = useState('');
 
     useEffect(()=>{
-
         const fetchVehiType = async () => {
             const response = await axiosInstance.get("/api/v1/vehicles/vehicle-types");
             console.log('API Response:', response.data);  // Log the response for debugging
-            setVehitype(response.data)
-            setVehitypeid(response.data[0].vehicleTypeId);
+            setVehitype(response.data);
         };
+        setName(crPtien.ten)
+        setDate(crPtien.ngay.split('/').reverse().join('-'))
+        setBienso(crPtien.bienso)
+        setVehitypeid(crPtien.typeid)
         fetchVehiType(); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
     },[])
 
     async function handleAdd() {
         if(name==''||date==''||bienso=='') {alert("Điền không hợp lệ"); return;}
-        await axiosInstance.post("/api/v1/vehicles",{
+        await axiosInstance.put(`/api/v1/vehicles/${crPtien.mapt}`,{
             licensePlate: bienso,
             name: name,
             apartmentId: cr_apart.id,
             registerDate: date,
             vehicleTypeId: vehitypeid,
         });
+        onShow(false)
+    }
+    async function handleDel() {
+        if(name==''||date==''||bienso=='') {alert("Điền không hợp lệ"); return;}
+        await axiosInstance.delete(`/api/v1/vehicles/${crPtien.mapt}`);
         onShow(false)
     }
 
@@ -50,7 +67,7 @@ const Themphuongtien:React.FC<newbox> = ({onShow}) => {
                     onClick={()=>onShow(false)}
                     >X</button>
                 </div>
-                <div className="text-center text-xl font-bold">THÊM PHƯƠNG TIỆN</div>
+                <div className="text-center text-xl font-bold">CHỈNH SỬA PHƯƠNG TIỆN</div>
                 <div className="p-3">
                     {/* row1 */}
                     <div className="flex items-top justify-between">
@@ -92,7 +109,8 @@ const Themphuongtien:React.FC<newbox> = ({onShow}) => {
                     
                     {/* row3 */}
                     <div className="mt-10 flex justify-center">
-                        <button className="p-2 rounded-xl bg-[#1e83a5] hover:bg-[#176b87] text-white" onClick={()=>handleAdd()}>THÊM</button>
+                        <button className="p-2 rounded-xl bg-[#1e83a5] hover:bg-[#176b87] text-white" onClick={()=>handleAdd()}>CHỈNH SỬA</button>
+                        <button className="bg-red-600 hover:bg-red-700 p-1 text-white rounded-xl ml-2" onClick={()=>handleDel()}>XÓA</button>
                     </div>
                 </div>
 
@@ -101,4 +119,4 @@ const Themphuongtien:React.FC<newbox> = ({onShow}) => {
     );
 }
 
-export default Themphuongtien;
+export default Chinhsuaptien;

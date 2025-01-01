@@ -1,15 +1,25 @@
+import { useAppSelector } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-    resiId : string;
 }
 
 interface role {
     code: number,
     name: string,
     enumName: string,
+}
+
+interface Canho{
+    id : number,
+    stt : number,
+    mach:string,
+    hoten:string,
+    dientich:number,
+    soluong:number,
+    phuongtien:number,
 }
 
 interface nhankhau {
@@ -26,23 +36,11 @@ interface nhankhau {
     vaitro : string
 }
 
-const init:nhankhau = {
-    stt : 0,
-    macd : "",
-    hoten :"",
-    gioitinh : "",
-    ngaysinh : "",
-    cccd : "",
-    quequan : "",
-    nghenghiep : "",
-    lienhe : "",
-    trangthai : "",
-    vaitro : ""
-}
  
-
-const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
-    const [data,setData] = useState<nhankhau>(init)
+const Chinhsua:React.FC<newbox> =({onShow}) => {
+    const cr_res = useAppSelector((state) =>state.global.cr_res)
+    const cr_apart = useAppSelector((state) =>state.global.cr_apart)
+    const [data,setData] = useState<nhankhau>()
     const [roledata,setRoledata] = useState<role[]>([])
     const [genderdata,setGenderdata] = useState<role[]>([])
     const [name,setName] = useState('');
@@ -70,23 +68,23 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
             
         }
         const fetchResi = async () => {
-            const response = await axiosInstance.get(`/api/v1/residents/${resiId}`, {
+            const response = await axiosInstance.get(`/api/v1/residents/${cr_res.macd}`, {
             });
             console.log('API Response:', response.data);  // Log the response for debugging
             // const tmp = new Array(response.data.content.size).fill(false)
-            if (response.data ) {
-                var item = response.data;
-                setName(item.fullName||"");
-                setCccd(item.identityCardNumber||"");
-                setContact(item.contact||"");
-                setDob(item.dateOfBirth||"");
-                setHome(item.homeTown||"");
-                setRole(item.householdRole.enumName||"");
-                setGender(item.gender.enumName||"")
-                setJob(item.job||"");
-            } else {
-                setData(init); // Update state with an empty array if no data is available
-            }
+           
+            var item = response.data;
+            setName(item.fullName||"");
+            setCccd(item.identityCardNumber||"");
+            setContact(item.contact||"");
+            setDob(item.dateOfBirth||"");
+            setHome(item.homeTown||"");
+            setRole(item.householdRole.enumName||"");
+            setGender(item.gender.enumName||"")
+            setJob(item.job||"");
+        
+             // Update state with an empty array if no data is available
+            
         };
         fetchGender()
         fetchRole()
@@ -97,21 +95,66 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
         console.log(name,gender,role,cccd,dob,home,contact,job)
         let isnum = /^\d+$/.test(cccd);
         if(name=='' || cccd == '' || !isnum || dob=='') {setWarn(true);return;}
-        // console.log()
         
-        await axiosInstance.put(`/api/v1/residents/${resiId}`,
-            {
-                fullName: name,
-                dateOfBirth: dob,
-                identityCardNumber: cccd,
-                contact: contact,
-                gender: gender,
-                hometown:home,
-                job :job,
-                currentLivingType: "THUONG_TRU",
-                householdRole: role,
-        })
-        onShow(false)
+        if(role == "OWNER") {
+            const response = await axiosInstance.post("/api/v1/residents/search", {
+                pageSize:999,
+                filters : [
+                    {
+                        name : "apartmentId",
+                        value : cr_apart.id,
+                        operation : "eq"
+                    }
+                ]
+            });
+            for (const item of response.data.content) {
+                if(item.householdRole.enumName=="OWNER") {
+                    await axiosInstance.put(`/api/v1/residents/${item.residentId}`,
+                        {
+                            fullName: item.fullName,
+                            dateOfBirth: item.dateOfBirth,
+                            identityCardNumber: item.identityCardNumber,
+                            contact: item.contact,
+                            gender: item.gender.enumName,
+                            hometown:item.hometown,
+                            job :item.job,
+                            currentLivingType: "THUONG_TRU",
+                            householdRole: "OTHER",
+                    })
+                    await axiosInstance.put(`/api/v1/residents/${cr_res.macd}`,
+                        {
+                            fullName: name,
+                            dateOfBirth: dob,
+                            identityCardNumber: cccd,
+                            contact: contact,
+                            gender: gender,
+                            hometown:home,
+                            job :job,
+                            currentLivingType: "THUONG_TRU",
+                            householdRole: role,
+                    })
+                    onShow(false)
+                    break;
+                }
+            }
+
+        }
+        else {
+            await axiosInstance.put(`/api/v1/residents/${cr_res.macd}`,
+                {
+                    fullName: name,
+                    dateOfBirth: dob,
+                    identityCardNumber: cccd,
+                    contact: contact,
+                    gender: gender,
+                    hometown:home,
+                    job :job,
+                    currentLivingType: "THUONG_TRU",
+                    householdRole: role,
+            })
+            onShow(false)
+        }
+
         
     }
 
@@ -150,7 +193,16 @@ const Chinhsua:React.FC<newbox> =({onShow,resiId}) => {
                             <div>Vai trò</div>
                             <select className="border-2 p-2 border-black rounded-xl" onChange={(e)=>setRole(e.target.value)} value={role}>
                             {
-                                
+                                cr_res.vaitro=="Chủ hộ" ?
+                                roledata.map((val,index)=>{
+                                    if(val.enumName == "OWNER")
+                                    return (
+                                        <option value={val.enumName}>
+                                            {val.name}
+                                        </option>
+                                    )
+                                })
+                                :
                                 roledata.map((val,index)=>{
                                     return (
                                         <option value={val.enumName}>
