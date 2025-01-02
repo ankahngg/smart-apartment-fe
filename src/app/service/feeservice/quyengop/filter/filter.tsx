@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Qgfilter from "./qgfilter";
 import axiosInstance from "@/utils/axiosConfig";
+import { useAppDispatch } from "@/redux/hooks";
+import globalSlice from "@/redux/globalSlice";
 
 interface floors {
     id : number, 
@@ -15,8 +17,12 @@ interface apartments {
 }
 
 function Filter() {
+    const dispatch = useAppDispatch()
     const [floordata,setFloordata] = useState<floors[]>([])
     const [apartmentdata,setApartmentdata] = useState<apartments[]>([])
+    const [floorid,setFloorid] = useState('');
+    const [apartid,setApartid] = useState('');
+    const [keyword,setKeyword] = useState('');
 
     useEffect(() => {
         const fetchInit = async () => {
@@ -37,8 +43,25 @@ function Filter() {
             }
         }
         fetchInit();
+        // doFilter();
         
     },[])
+
+    function cancelFilter(): void {
+        setFloorid('')
+        setApartid('')
+        setKeyword('')
+        setApartmentdata([])
+        dispatch(globalSlice.actions.set_filter_apart(''))
+        dispatch(globalSlice.actions.set_filter_floor(''))
+        dispatch(globalSlice.actions.set_filter_keyword(''))
+    }
+
+    function doFilter(): void {
+        dispatch(globalSlice.actions.set_filter_apart(apartid))
+        dispatch(globalSlice.actions.set_filter_floor(floorid))
+        dispatch(globalSlice.actions.set_filter_keyword(keyword))
+    }
     
 
     async function handleFloor(id:string) {
@@ -52,7 +75,7 @@ function Filter() {
         })
         if (response.data && response.data.content) {
             const fetchedData = response.data.content.map((item: any, index: number) => ({
-                id: item.id,
+                id: item.apartmentId,
                 name: item.name,
                 code: item.code,
             }));
@@ -70,13 +93,14 @@ function Filter() {
 
                 <div className="flex-1">
                     <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl"
-                    onChange={(e)=>handleFloor(e.target.value)}
+                    onChange={(e)=>{handleFloor(e.target.value),setFloorid(e.target.value)}}
+                    value={floorid}
                     >
                         <option value={'default'}>CHỌN TẦNG</option>
                         {
                             floordata.map((val) => {
                                 return (
-                                    <option value={val.id}> {val.name}</option>
+                                    <option value={val.id}>Tầng {val.floorNumber}</option>
                                 )
                             })
                         }
@@ -84,21 +108,21 @@ function Filter() {
                 </div>
 
                 <div className="flex-1 ml-2">
-                    <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl" >
+                    <select id="status" name="status" className="p-2 w-full  text-l border-black border-2 rounded-xl" onChange={(e)=>setApartid(e.target.value)} value={apartid}>
                         <option value={'default'}>CHỌN CĂN HỘ</option>
                         {
                             apartmentdata.map((val) => {
                                 return (
-                                    <option value={val.id}> {val.name}</option>
+                                    <option value={val.id}> Căn hộ {val.code}</option>
                                 )
                             })
                         }
                     </select>
                 </div>
             </div>
-            <input type="text" placeholder="NHẬP TÊN CHỦ HỘ" className="text-black text-l w-full p-2 border-black border-2 mb-2 rounded-xl" />
+            
 
-            <Qgfilter />
+            <Qgfilter cancleFilter={cancelFilter} doFilter={doFilter}/>
         </div>
     );
 }

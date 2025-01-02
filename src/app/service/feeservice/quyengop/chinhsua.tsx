@@ -3,7 +3,18 @@ import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
-
+    crDonate:donate
+}
+interface donate {
+    id:number,
+    apartmentId:number,
+    campaignId:number,
+    donationDate:string,
+    apartmentCode:string,
+    campaignName:string,
+    startDate:string,
+    endDate:string,
+    amount:number
 }
 
 const getFormattedDate = (): string => {
@@ -35,11 +46,11 @@ const getFormattedDate = (): string => {
 interface Canho{
     id : number,
     mach:string,
-    hoten:string,
+    name:string,
 }
 
 
-const Chinhsua:React.FC<newbox> = ({onShow}) => {
+const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
     const [data, setData] = useState<Chiendich[]>([]);
     const [apartdata,setApartdata] = useState<Canho[]>([])
     const [state,setState] = useState('all')
@@ -80,17 +91,39 @@ const Chinhsua:React.FC<newbox> = ({onShow}) => {
                         tgkt : formatDate(item.endDate),
                     })})
                 setData(fetchedData); // Cập nhật state `data`
-                setQgchoose(fetchedData[0].maqg)
                 console.log('Fetched Data:', fetchedData);  // Log fetched data for debugging
             } else {
                 setData([]); // Cập nhật state `data` với mảng rỗng nếu không có dữ liệu
             }
         };
+
+        const fetchApart = async () => {
+            const res = await axiosInstance.post("/api/v1/apartments/search",
+                {
+                    pageSize:999,
+                }
+            )
+            const fetchedData = res.data.content.map((item:any,index:any) =>{
+                return {
+                    id : item.apartmentId,
+                    mach:item.code,
+                    name:item.owner.fullName||"Chưa có"
+                }
+            })
+            console.log("Fetched data apart:",fetchedData)
+            setChchoose(fetchedData[0].id)
+            setApartdata(fetchedData)
+        }
+        fetchApart();
         fetchCampaigns(); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
+        setChchoose(crDonate.apartmentId)
+        setDatechoose(crDonate.donationDate.split('/').reverse().join('-'))
+        setQgchoose(crDonate.campaignId)
+        setAmount(crDonate.amount)
     },[state])
 
-    async function handleAdd() {
-        await axiosInstance.post("/api/v1/donations",{
+    async function handleChange() {
+        await axiosInstance.put(`/api/v1/donations/${crDonate.id}`,{
             amount: amount,
             donationDate: datechoose,
             apartmentId: chchoose,
@@ -99,13 +132,12 @@ const Chinhsua:React.FC<newbox> = ({onShow}) => {
         onShow(false)
     }
 
-    async function handleSearch(keyword:string) {
-        const res = await axiosInstance.post("/api/v1/apartments/search",{
-            keyword: keyword,
-            pageSize: 999,
-        })
-        console.log(res.data.content)
+    async function handleDel() {
+        await axiosInstance.delete(`/api/v1/donations/${crDonate.id}`)
+        onShow(false)
     }
+
+    
 
     return (
         
@@ -166,10 +198,7 @@ const Chinhsua:React.FC<newbox> = ({onShow}) => {
                     </div>
 
                     <div className="flex mt-2 items-center">
-                        <div className="font-bold mr-2 w-[150px]">Mã căn hộ</div>
-                        <div>
-                            <input type="text" placeholder="Tìm kiếm" className="p-1 border-black border-2 w-[100px]" onChange={(e)=>handleSearch(e.target.value)} />
-                        </div>
+                        <div className="font-bold w-[150px]">Mã căn hộ</div>
                         <div className="ml-2">
                             <select className="border-2 border-black p-2 rounded-xl w-[100px]" onChange={(e)=>setChchoose(parseInt(e.target.value))} value={chchoose}>
                                 {
@@ -186,7 +215,14 @@ const Chinhsua:React.FC<newbox> = ({onShow}) => {
                     </div>
                     <div className="flex mt-2">
                         <div className="font-bold w-[150px]">Tên chủ hộ</div>
-                        <div className=" ml-2">Nguyen Phuc An Khang</div>
+                        <div className=" ml-2">
+                            {
+                                apartdata.map((item,index) => {
+                                    if(item.id == chchoose) return <>{item.name}</>
+                                    
+                                })
+                            }
+                        </div>
                     </div>
 
                     <div className="flex mt-2 items-center">
@@ -203,7 +239,9 @@ const Chinhsua:React.FC<newbox> = ({onShow}) => {
                         </div>
                     </div>
                     <div className="flex justify-center mt-5 mb-2">
-                        <button className="bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white rounded-xl" onClick={()=>handleAdd()}>QUYÊN GÓP</button>
+                        <button className="bg-[#1e83a5] hover:bg-[#176b87] p-1 text-white rounded-xl" onClick={()=>handleChange()}>CHỈNH SỬA</button>
+                        <button className="bg-red-600 hover:bg-red-700 p-1 text-white rounded-xl ml-2" onClick={()=>handleDel()}>XÓA</button>
+
                     </div>
                         
                 </div>

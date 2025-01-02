@@ -1,8 +1,14 @@
 import globalSlice from "@/redux/globalSlice";
-import { useAppDispatch } from "@/redux/hooks"
+import { useAppDispatch, useAppSelector } from "@/redux/hooks"
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect,useState } from "react";
 import Themchiendich from "./themchiendich";
+
+interface newbox {
+    
+    doFilter : () => void,
+    cancleFilter : () => void,
+}
 
 interface Chiendich{
     maqg:number,tenqg:string,tongtien:number,tgbd:string,tgkt:string
@@ -32,9 +38,11 @@ const formatDate = (dateString: string): string => {
     }).format(date);
   };
 
-function Qgfilter() {
+const Qgfilter:React.FC<newbox> = ({cancleFilter,doFilter}) => {
+    const dispatch = useAppDispatch()
     const [data, setData] = useState<Chiendich[]>([]);
     const [addcp,setAddcp] = useState(false)
+    const reloadd = useAppSelector((state)=>state.global.reload)
     const [reload,setReload] = useState(false)
     const [state,setState] = useState('all')
     const [currentPage, setCurrentPage] = useState(1);
@@ -65,7 +73,7 @@ function Qgfilter() {
                 console.log('API Response:', response.data);  // Log the response for debugging
             
             // const tmp = new Array(response.data.content.size).fill(false)
-            setChoosen(new Array(response.data.content.length).fill(false))
+            setChoosen(new Array(response.data.content.length).fill(true))
             setSize(response.data.content.length)
             
             if (response.data && response.data.content) {
@@ -84,7 +92,10 @@ function Qgfilter() {
             }
         };
         fetchCampaigns(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    }, [reload,state,addcp]); // Các dependency bao gồm `currentPage` và `pageSize`
+        
+        
+    }, [reload,state,addcp,reloadd]); // Các dependency bao gồm `currentPage` và `pageSize`
+
    
     function handleCheck(checked:boolean,index:number) {
         setChoosen(choosen.map((val,ind)=>{
@@ -93,7 +104,22 @@ function Qgfilter() {
             }))
     }
 
+    function doFilter2() {
+        var arr:number[] = []
+        for (const [i, val] of choosen.entries()) {
+            if (val === true) {
+                arr.push(data[i].maqg)
+            }
+        }
+        dispatch(globalSlice.actions.set_filter_campaigns(arr))
+    }
+
     async function handleDelete() {
+        for (const [i, val] of choosen.entries()) {
+            if (val === true) {
+                if(data[i].tongtien != 0) {alert("Chiến dịch có bản ghi ! Không thể xóa"); return}
+            }
+        }
         for (const [i, val] of choosen.entries()) {
             if (val === true) {
                 await axiosInstance.delete(`/api/v1/campaigns/${data[i].maqg}`);
@@ -112,7 +138,7 @@ function Qgfilter() {
             }
             <div className="flex justify-between items-center ">
                 <div className="w-fit">
-                    <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>setState(e.target.value)}>
+                    <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>setState(e.target.value)} value={state}>
                         <option value='all'>TẤT CẢ</option>
                         <option value='open'>VẪN CÒN THU</option>
                         <option value='close'>ĐÃ ĐÓNG ĐƠN</option>
@@ -136,9 +162,9 @@ function Qgfilter() {
             <div className="mt-2">
                 <table>
                     <tr className="text-sm align-top border-b-2 border-black">
-                        <th className="p-1 w-fit">MQG</th>
-                        <th className="p-1 w-[150px]">Tên quyên góp</th>
-                        <th className="p-1 ">Tổng tiền</th>
+                        
+                        <th className="p-1 w-[100px]">Tên quyên góp</th>
+                        <th className="p-1 w-[100px]">Tổng tiền</th>
                         <th className="p-1">Thời gian bắt đầu</th>
                         <th className="p-1">Thời gian kết thúc</th>
                         <th className="p-1">Chọn</th>
@@ -148,9 +174,9 @@ function Qgfilter() {
                             
                             return (
                             <tr className="text-center text-sm align-top hover:bg-[#68d3cc1c]">
-                                <td>{val.maqg}</td>
+                                
                                 <td>{val.tenqg}</td>
-                                <td>{val.tongtien}</td>
+                                <td>{(val.tongtien).toLocaleString('de-DE')} VND</td>
                                 <td>{val.tgbd}</td>
                                 <td>{val.tgkt}</td>
                                 <td>
@@ -161,6 +187,14 @@ function Qgfilter() {
                     }
 
                 </table>
+            </div>
+            <div className="flex mt-2 justify-end">
+                <button className="border-black border-2 p-2 rounded-xl hover:bg-gray-200"
+                onClick={()=>{cancleFilter(),setState('all'),doFilter2()}}
+                >HỦY LỌC</button>
+                <button className="ml-4 p-2 bg-[#1e83a5] hover:bg-[#176b87] text-white rounded-xl"
+                onClick={()=>{doFilter(),doFilter2()}}
+                >ÁP DỤNG</button>
             </div>
         </div>
     );

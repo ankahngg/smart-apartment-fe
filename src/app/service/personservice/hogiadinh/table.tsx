@@ -22,6 +22,7 @@ function Table() {
     const filter_apart = useAppSelector((state) => state.global.filter_apart)
     const filter_floor = useAppSelector((state) => state.global.filter_floor)
     const filter_keyword = useAppSelector((state) => state.global.filter_keyword)
+    const filter_campaigns = useAppSelector((state) => state.global.filter_campaigns)
     const dispatch = useAppDispatch()
     const [data, setData] = useState<Canho[]>([]);
     const [pageSize,setPageSize] = useState(10); // Số item mỗi trang

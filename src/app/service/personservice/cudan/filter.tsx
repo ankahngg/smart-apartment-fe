@@ -21,10 +21,6 @@ function Filter() {
                     })
                 }
             </select>
-            <input className="p-2 rounded-xl mb-2 w-full border-2 border-black" placeholder="SỐ NHÂN KHẨU" type="number"/>
-            <input className="p-2 rounded-xl mb-2 w-full border-2 border-black" placeholder="SỐ THƯỜNG TRÚ" type="number"/>
-            <input className="p-2 rounded-xl mb-2 w-full border-2 border-black" placeholder="SỐ TẠM TRÚ" type="number"/>
-            <input className="p-2 rounded-xl mb-2 w-full border-2 border-black" placeholder="SỐ TẠM VẮNG" type="number"/>
             <input type="text" placeholder="CHỌN CĂN HỘ : 2.05" className=" p-2 text-black text-l w-full border-black border-2 rounded-xl mb-2" /> 
             <input type="text" placeholder="NHẬP TÊN CHỦ HỘ" className="text-black text-l w-full p-2 border-black border-2 mb-2 rounded-xl" /> 
             <div className="flex mt-2 justify-end">

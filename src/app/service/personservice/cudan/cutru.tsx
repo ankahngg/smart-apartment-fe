@@ -1,4 +1,5 @@
-import Filter from "./filter";
+
+import Filter from "../hogiadinh/filter";
 import Table from "./table";
 
 function Cutru() {

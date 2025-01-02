@@ -26,7 +26,7 @@ export default function Menu(){
     const [service,setService] = useState(false)
     function ServiceDrop() {
         return (
-            <div className='absolute top-[169px] w-[120px]'>
+            <div className='absolute w-[120px] top-[55px]'>
                 <div className='hover:bg-[#64ccc5] bg-[#176b87] p-1 '
                 onClick={()=>setService(!service)}
                 >
@@ -59,21 +59,31 @@ export default function Menu(){
         )
     }
 
+    function handleLogout() {
+        
+    }
+
     return (
         <div className='bg-white relative'>
             <div className='absolute right-0 top-1/2 -translate-y-1/2 mr-2'>
-                <div className='flex'>
-                    <button className='text-white text-sm p-1 border-2'
-                    >Tài khoản</button>
-                    <button className='text-white text-sm p-1 border-2 ml-1'>Đăng xuất</button>
+                <div className='flex items-center'>
+                    <div className='text-white mr-2'>Xin chào admin</div>
+                    <Link
+                        href={'/account'}
+                        className="text-white p-1 block text-sm border-2"
+                    >
+                    Tài khoản
+                    </Link>
+                    <button className='text-white text-sm p-1 border-2 ml-1' onClick={()=>handleLogout()}>Đăng xuất</button>
                 </div>
+
             </div>
             <div className='flex justify-center bg-[#176b87] '>
                 {
                     menus.map((item,index)=>{
                         if(item.name == "Dịch Vụ") {
                             return (
-                                <div className='flex items-center p-2 '> 
+                                <div className='flex items-center p-2 relative'> 
                                     <button className='text-white hover:bg-[#64ccc5] p-2 '
                                     // onMouseLeave={()=>setService(false)}
                                     onClick={()=>setService(!service)}

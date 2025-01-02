@@ -3,6 +3,8 @@ import Dongtien from "./dongtien";
 import Chinhsua from "./chinhsua";
 import Quyengop from "./quyengop";
 import axiosInstance from "@/utils/axiosConfig";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import globalSlice from "@/redux/globalSlice";
 
 interface donate {
     apartmentId:number,
@@ -12,7 +14,8 @@ interface donate {
     campaignName:string,
     startDate:string,
     endDate:string,
-    amount:number
+    amount:number,
+    id:number,
 }
 
 const formatDate = (dateString: string): string => {
@@ -25,15 +28,44 @@ const formatDate = (dateString: string): string => {
   };
 
 function Table() {
+    const filter_apart = useAppSelector((state) => state.global.filter_apart)
+    const filter_floor = useAppSelector((state) => state.global.filter_floor)
+    const filter_keyword = useAppSelector((state) => state.global.filter_keyword)
+    const filter_campaigns = useAppSelector((state) => state.global.filter_campaigns)
+    const dispatch = useAppDispatch()
+    const [crDonate,setCrDonate] = useState<donate>()
     const [data,setData] = useState<donate[]>([])
     const [change,setChange] = useState(false)
     const [qg,setQg] = useState(false)
     
     useEffect(()=>{
         const fetchDonate = async() => {
+            var filters:{
+                name: string,
+                value: any,
+                operation: string,
+              }[] = []
+
+            if(filter_apart != '') filters.push({
+                name: "apartmentId",
+                value: filter_apart,
+                operation: "eq",
+            })
+            // if(filter_floor != '') filters.push({
+            //     name: "apartmentId",
+            //     value: filter_apart,
+            //     operation: "eq",
+            // })
+            filters.push({
+                name: "campaignId",
+                value: filter_campaigns,
+                operation: "in",
+            })
+
             const res = await axiosInstance.post("/api/v1/donations/search",
                 {
-                    pageSize:999
+                    pageSize:999,
+                    filters:filters,
                 }
             );
             const fetcheddata = res.data.content.map((item:any,index:any) =>{
@@ -46,18 +78,22 @@ function Table() {
                     startDate:formatDate(item.campaign.startDate),
                     endDate:formatDate(item.campaign.endDate),
                     amount:item.amount,
+                    id:item.id,
                 }
             })
             setData(fetcheddata)
         }
         fetchDonate()
-    },[qg])
+        dispatch(globalSlice.actions.set_reload())
+        
+
+    },[qg,change,filter_apart,filter_floor,filter_keyword,filter_campaigns])
 
     return (
     <div className="p-2 border-2 h-[800px] border-black">
         {
             change ?
-            <Chinhsua onShow={setChange} />
+            <Chinhsua onShow={setChange} crDonate={crDonate}/>
             :
             <></>
         }
@@ -115,7 +151,9 @@ function Table() {
                                 <td className="p-2">{(val.amount).toLocaleString('de-DE')}</td>
                                 <td className="p-2">{val.donationDate}</td>
                                 <td className="p-2">
-                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white" onClick={()=>setChange(true)}>Chỉnh sửa</button>
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white" onClick={()=>{setCrDonate(val),setChange(true)}}
+                                    
+                                    >Chỉnh sửa</button>
                                 </td>
                             </tr>
                         )

@@ -12,7 +12,11 @@ interface StateType {
     filter_floor:string,
     filter_apart:string,
     filter_keyword:string,
+    filter_campaigns:number[],
+    cr_invoice:Invoice,
+    filter_status:string,
 }
+
 
 const initState : StateType = {
     dongtien : false,
@@ -41,11 +45,37 @@ const initState : StateType = {
         trangthai : '',
         vaitro : ''
     },
+    cr_invoice :{
+        id:0,
+        stt: 0,
+        mhd: 0,
+        mch: '',
+        hoten: '',
+        dotthu: '',
+        tongtien: 0,
+        state: '',
+        ngaydong: '',
+        note:''
+    },
     reload:false,
     filter_floor:'',
     filter_apart:'',
-    filter_keyword:''
+    filter_keyword:'',
+    filter_campaigns:[],
+    filter_status:''
+}
 
+interface Invoice {
+    id:number,
+    stt: number;
+    mhd: number;
+    mch: string;
+    hoten: string;
+    dotthu: string;
+    tongtien: number;
+    state: string;
+    ngaydong: string;
+    note:string;
 }
 
 interface Canho{
@@ -105,6 +135,15 @@ export default createSlice({
         },
         set_filter_keyword :(state,action : PayloadAction<string>) =>{
             state.filter_keyword = action.payload;
+        },
+        set_filter_campaigns :(state,action : PayloadAction<number[]>) =>{
+            state.filter_campaigns = action.payload;
+        },
+        set_cr_invoice :(state,action : PayloadAction<Invoice>) =>{
+            state.cr_invoice = action.payload;
+        },
+        set_filter_status:(state,action : PayloadAction<string>) =>{
+            state.filter_status = action.payload;
         },
     }
 })

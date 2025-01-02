@@ -52,7 +52,7 @@ function Setting() {
                         fee.map((val,index)=>{
                             return (
                                 <div className="flex">
-                                    <div className="w-[150px]">{val.category.name} :</div>
+                                    <div className="w-[150px] font-bold">{val.category.name} :</div>
                                     <div>{val.unitPrice} VND/m^2</div>
                                 </div>
                             )
@@ -88,10 +88,10 @@ function Setting() {
                         vehifee.map((val,index) =>{
                             return (
                                 <div className="flex">
-                                    <div className="w-[150px]">Phí gửi {val.feeCategory =="PARKING_CAR" ? "Ô tô" :
+                                    <div className="w-[150px] font-bold">Phí gửi {val.feeCategory =="PARKING_CAR" ? "Ô tô" :
                                             val.feeCategory =="PARKING_MOTORCYCLE" ? "Xe máy" :
-                                            val.feeCategory =="PARKING_BICYCLE" ? "Xe đạp" :"Khác"}</div>
-                                    <div>{val.unitPrice} / phương tiện</div>
+                                            val.feeCategory =="PARKING_BICYCLE" ? "Xe đạp" :"Khác"}:</div>
+                                    <div className="w-[150px]">{val.unitPrice} / pt</div>
                                 </div>
                             )
                         })

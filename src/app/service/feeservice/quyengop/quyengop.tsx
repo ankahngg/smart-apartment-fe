@@ -93,11 +93,13 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
                     pageSize:999,
                 }
             )
+            console.log("apart data res:",res)
+
             const fetchedData = res.data.content.map((item:any,index:any) =>{
                 return {
                     id : item.apartmentId,
                     mach:item.code,
-                    name:item.owner.fullName||"Chưa có"
+                    name:item.owner?item.owner.fullName?item.owner.fullName:"Chưa có":"Chưa có"
                 }
             })
             console.log("Fetched data apart:",fetchedData)
@@ -109,6 +111,7 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
     },[state])
 
     async function handleAdd() {
+        if(datechoose=='') {alert("Ngày không được để trống"); return}
         await axiosInstance.post("/api/v1/donations",{
             amount: amount,
             donationDate: datechoose,
@@ -186,7 +189,7 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
 
                     <div className="flex mt-2 items-center">
                         <div className="font-bold w-[150px]">Mã căn hộ</div>
-                        <div className="ml-2">
+                        <div className="">
                             <select className="border-2 border-black p-2 rounded-xl w-[100px]" onChange={(e)=>setChchoose(parseInt(e.target.value))} value={chchoose}>
                                 {
                                     apartdata.map((val,index) => {
@@ -202,7 +205,7 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
                     </div>
                     <div className="flex mt-2">
                         <div className="font-bold w-[150px]">Tên chủ hộ</div>
-                        <div className=" ml-2">
+                        <div className=" ">
                             {
                                 apartdata.map((item,index) => {
                                     if(item.id == chchoose) return <>{item.name}</>
@@ -213,16 +216,16 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
                     </div>
 
                     <div className="flex mt-2 items-center">
-                        <div className="font-bold mr-2 w-[150px]">Số tiền</div>
+                        <div className="font-bold w-[150px]">Số tiền</div>
                         <div>
-                            <input type="number" className="p-1 border-black border-2 w-[100px]" onChange={(e)=>setAmount(parseInt(e.target.value))} value={amount}/>
+                            <input type="number" className="p-1 border-black border-2 w-[150px] rounded-xl" onChange={(e)=>setAmount(parseInt(e.target.value))} value={amount}/>
                         </div>
                         <div className="ml-2">VND</div>
                     </div>
                     <div className="flex mt-2 items-center">
-                        <div className="font-bold mr-2 w-[150px]">Ngày đóng</div>
+                        <div className="font-bold w-[150px]">Ngày đóng</div>
                         <div>
-                            <input type="date" className="p-1 border-black border-2 " onChange={(e)=>setDatechoose(e.target.value)} value={datechoose}/>
+                            <input type="date" className="p-1 border-black border-2 rounded-xl w-[150px]" onChange={(e)=>setDatechoose(e.target.value)} value={datechoose}/>
                         </div>
                     </div>
                     <div className="flex justify-center mt-5 mb-2">

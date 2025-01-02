@@ -40,6 +40,9 @@ function Filter() {
             }
         }
         fetchFloor()
+        dispatch(globalSlice.actions.set_filter_apart(''))
+        dispatch(globalSlice.actions.set_filter_floor(''))
+        dispatch(globalSlice.actions.set_filter_keyword(''))
     },[])
 
     async function handleFloor(id:string) {
