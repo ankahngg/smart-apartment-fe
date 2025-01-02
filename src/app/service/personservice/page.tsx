@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react';
 import Hogiadinh from './hogiadinh/hogiadinh';
-import Cutru from './cutru/cutru';
+import Cutru from './cudan/cutru';
 function Page() {
     const [page,setPage] = useState("hogiadinh")
     return (
@@ -14,7 +14,7 @@ function Page() {
                         Quản lí Hộ Gia Đình
                     </option>
                     <option value="cutru">
-                        Quản lí Cư Trú
+                        Quản lí Cư dân
                     </option>
                 </select>
                 </div>

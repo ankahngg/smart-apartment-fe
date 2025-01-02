@@ -44,7 +44,7 @@ function Qgfilter() {
     useEffect(() => {
         var close_filters :{name:string,operation:string,value:string,type:string}[]= [
             {
-                name:"endDate",operation:"lt",value:getFormattedDate(),type:"string"
+                name:"endDate",operation:"lt",value:getFormattedDate(),type:"date"
             }
         ]
         var all_filters :{name:string,operation:string,value:string,type:string}[]= [
@@ -52,7 +52,7 @@ function Qgfilter() {
         ]
         var open_filters :{name:string,operation:string,value:string,type:string}[]= [
             {
-                name:"endDate",operation:"gt",value:getFormattedDate(),type:"string"
+                name:"endDate",operation:"gt",value:getFormattedDate(),type:"date"
             }
         ]
         const fetchCampaigns = async (page: number) => {
@@ -114,8 +114,8 @@ function Qgfilter() {
                 <div className="w-fit">
                     <select className="border-2 border-black p-2 rounded-xl mr-2" onChange={(e)=>setState(e.target.value)}>
                         <option value='all'>TẤT CẢ</option>
-                        <option value='close'>VẪN CÒN THU</option>
-                        <option value='open'>ĐÃ ĐÓNG ĐƠN</option>
+                        <option value='open'>VẪN CÒN THU</option>
+                        <option value='close'>ĐÃ ĐÓNG ĐƠN</option>
                     </select>
                 </div>
                 <div className="w-full">

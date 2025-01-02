@@ -8,7 +8,10 @@ interface StateType {
     hgd_chitiet : boolean,
     cr_apart : Canho,
     cr_res:Cudan,
-    reload:boolean
+    reload:boolean,
+    filter_floor:string,
+    filter_apart:string,
+    filter_keyword:string,
 }
 
 const initState : StateType = {
@@ -39,6 +42,9 @@ const initState : StateType = {
         vaitro : ''
     },
     reload:false,
+    filter_floor:'',
+    filter_apart:'',
+    filter_keyword:''
 
 }
 
@@ -90,6 +96,15 @@ export default createSlice({
         },
         set_reload :(state) =>{
             state.reload = !state.reload;
+        },
+        set_filter_floor :(state,action : PayloadAction<string>) =>{
+            state.filter_floor = action.payload;
+        },
+        set_filter_apart :(state,action : PayloadAction<string>) =>{
+            state.filter_apart = action.payload;
+        },
+        set_filter_keyword :(state,action : PayloadAction<string>) =>{
+            state.filter_keyword = action.payload;
         },
     }
 })

@@ -19,8 +19,10 @@ interface Canho{
 }
 
 function Table() {
+    const filter_apart = useAppSelector((state) => state.global.filter_apart)
+    const filter_floor = useAppSelector((state) => state.global.filter_floor)
+    const filter_keyword = useAppSelector((state) => state.global.filter_keyword)
     const dispatch = useAppDispatch()
-    //const col:string[] = ['STT','Mã hóa đơn','Mã căn hộ','Họ tên chủ hộ',,'Đợt thu','Phí quản lí','Phí dịch vụ','Trạng thái','Ngày đóng','Xóa']
     const [data, setData] = useState<Canho[]>([]);
     const [pageSize,setPageSize] = useState(10); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -29,9 +31,33 @@ function Table() {
 
     useEffect(()=>{
         const fetchApart = async (page: number) => {
+            const apart_filter = [
+                {
+                    name:"apartmentId",
+                    operation:"eq",
+                    value:filter_apart
+                }
+            ]
+            const floor_filter = [
+                {
+                    name:"floorId",
+                    operation:"eq",
+                    value:filter_floor
+                }
+            ]
+
+            var filters:any;
+            if(filter_apart != '') filters = apart_filter;
+            else if(filter_floor != '') filters = floor_filter;
+            else filters = []
+            console.log('filter',filters)
+            
             const response = await axiosInstance.post("/api/v1/apartments/search", {
                 page: page - 1,
+                keyword:filter_keyword,
                 pageSize,
+                filters,
+                
             });
             console.log('API Response:', response.data);  // Log the response for debugging
             // const tmp = new Array(response.data.content.size).fill(false)
@@ -65,7 +91,7 @@ function Table() {
             
         };
         fetchApart(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    },[currentPage, pageSize,chitiet])
+    },[currentPage, pageSize,chitiet,filter_apart,filter_floor,filter_keyword])
 
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
@@ -87,7 +113,7 @@ function Table() {
         }
         <div className="flex justify-between">
             <div>
-                <div className="text-xl font-bold">Danh sách nhân khẩu</div>
+                <div className="text-xl font-bold">Danh sách căn hộ</div>
                 <div className="pt-2">
                     <div className="flex space-x-2">
                         <div className="text-sm">Hiển thị</div>

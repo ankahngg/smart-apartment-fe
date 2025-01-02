@@ -3,23 +3,43 @@ import { useEffect, useState } from "react";
 import Chinhsua2 from "./chinhsua2";
 import Chinhsua1 from "./chinhsua1";
 
+interface fee {
+    feeTypeId: number,
+    category: {
+        code: number,
+        name: string,
+        enumName: string
+    },
+    unitPrice: number,
+    description: string
+}
+
+interface vehifee{
+    vehicleTypeId: number,
+    feeCategory: string,
+    unitPrice: number
+}
+
 function Setting() {
     const [change1,setChange1] = useState(false);
     const [change2,setChange2] = useState(false);
+    const [fee,setFee] = useState<fee[]>([])
+    const [vehifee,setVehifee] = useState<vehifee[]>([])
     useEffect(() =>{
-        // const fetchFeeType = async () =>{
-        //     const response = await axiosInstance.post("/api/v1/fee-types/search",{
-        //         pageSize:999,
-        //     });
-        //     console.log(response)
-        // }
-        // const fetchVehicleType = async () =>{
-        //     const response = await axiosInstance.get("/api/v1/vehicles/vehicle-types");
-        //     console.log(response)
-        // }
-        // fetchFeeType();
-        // fetchVehicleType();
-    })
+        const fetchFeeType = async () =>{
+            const response = await axiosInstance.post("/api/v1/fee-types/search",{
+                pageSize:999,
+            });
+            setFee(response.data.content)
+        }
+        const fetchVehicleType = async () =>{
+            const response = await axiosInstance.get("/api/v1/vehicles/vehicle-types");
+            console.log(response)
+            setVehifee(response.data)
+        }
+        fetchFeeType();
+         fetchVehicleType();
+    },[change1,change2])
     return (
         <div className="p-5 pt-0 h-[600px]">
             {/* row1 */}
@@ -28,21 +48,17 @@ function Setting() {
                     <div className="text-lg italic">
                         Phí bắt buộc
                     </div>
-                    <div className="flex">
-                        <div className="mr-2">
-                            Ngày thay đổi
-                        </div>
-                        <div>20-10-2024</div>
-                    </div>
+                    {
+                        fee.map((val,index)=>{
+                            return (
+                                <div className="flex">
+                                    <div className="w-[150px]">{val.category.name} :</div>
+                                    <div>{val.unitPrice} VND/m^2</div>
+                                </div>
+                            )
+                        })
+                    }
                     
-                    <div className="flex">
-                        <div className="w-[150px]">Phí quản lý :</div>
-                        <div>3000 VND/m^2</div>
-                    </div>
-                    <div className="flex">
-                        <div className="w-[150px]">Phí dịch vụ :</div>
-                        <div>4000 VND/m^2</div>
-                    </div>
                 </div>
                 <div className="ml-20">
                     <button className="bg-[#1e83a5] hover:bg-[#176b87] text-white p-1 rounded-xl"
@@ -53,13 +69,13 @@ function Setting() {
             </div>
             {
                 change1?
-                <Chinhsua1 onShow={setChange1}/>
+                <Chinhsua1 onShow={setChange1} fee = {fee}/>
                 :
                 <></>
             }
             {
                     change2?
-                    <Chinhsua2 onShow={setChange2}/>
+                    <Chinhsua2 onShow={setChange2} vehifee={vehifee}/>
                     :
                     <></>
                 }
@@ -68,29 +84,18 @@ function Setting() {
                     <div className="text-lg italic">
                         Phí gửi xe
                     </div>
-                    <div className="flex">
-                        <div className="mr-2">
-                            Ngày thay đổi
-                        </div>
-                        <div>20-10-2024</div>
-                    </div>
-                    
-                    <div className="flex">
-                        <div className="w-[150px]">Phí gửi ô tô :</div>
-                        <div>3000 VND/m^2</div>
-                    </div>
-                    <div className="flex">
-                        <div className="w-[150px]">Phí gửi xe máy :</div>
-                        <div>4000 VND/m^2</div>
-                    </div>
-                    <div className="flex">
-                        <div className="w-[150px]">Phí gửi xe đạp :</div>
-                        <div>4000 VND/m^2</div>
-                    </div>
-                    <div className="flex">
-                        <div className="w-[150px]">Phí gửi khác :</div>
-                        <div>4000 VND/m^2</div>
-                    </div>
+                    {
+                        vehifee.map((val,index) =>{
+                            return (
+                                <div className="flex">
+                                    <div className="w-[150px]">Phí gửi {val.feeCategory =="PARKING_CAR" ? "Ô tô" :
+                                            val.feeCategory =="PARKING_MOTORCYCLE" ? "Xe máy" :
+                                            val.feeCategory =="PARKING_BICYCLE" ? "Xe đạp" :"Khác"}</div>
+                                    <div>{val.unitPrice} / phương tiện</div>
+                                </div>
+                            )
+                        })
+                    }
                 </div>
                 <div className="ml-20">
                     <button className="bg-[#1e83a5] hover:bg-[#176b87] text-white p-1 rounded-xl"

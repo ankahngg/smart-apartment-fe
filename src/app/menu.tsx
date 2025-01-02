@@ -22,6 +22,7 @@ export default function Menu(){
             src : '/search',
         }
     ]
+    
     const [service,setService] = useState(false)
     function ServiceDrop() {
         return (
@@ -59,8 +60,14 @@ export default function Menu(){
     }
 
     return (
-        <div className='bg-white'
-        >
+        <div className='bg-white relative'>
+            <div className='absolute right-0 top-1/2 -translate-y-1/2 mr-2'>
+                <div className='flex'>
+                    <button className='text-white text-sm p-1 border-2'
+                    >Tài khoản</button>
+                    <button className='text-white text-sm p-1 border-2 ml-1'>Đăng xuất</button>
+                </div>
+            </div>
             <div className='flex justify-center bg-[#176b87] '>
                 {
                     menus.map((item,index)=>{

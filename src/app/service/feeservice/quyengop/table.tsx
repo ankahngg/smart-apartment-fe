@@ -1,41 +1,69 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dongtien from "./dongtien";
 import Chinhsua from "./chinhsua";
+import Quyengop from "./quyengop";
+import axiosInstance from "@/utils/axiosConfig";
+
+interface donate {
+    apartmentId:number,
+    campaignId:number,
+    donationDate:string,
+    apartmentCode:string,
+    campaignName:string,
+    startDate:string,
+    endDate:string,
+    amount:number
+}
+
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
 
 function Table() {
-
-    const data:{stt:number,mqg:string,tenqg:string,tgbd:string, tgkt:string,mch:string,hoten:string,sotien:number,ngaydong:string}[] = [
-        {
-            stt:1,
-            mqg:"qg101",
-            tenqg:"Quy tre em hiem ngheo vuot kho",
-            tgbd:"20-10-2024",
-            tgkt:"20-10-2025",
-            mch:"12.01",
-            hoten:"Nguyen Phuc An Khang",
-            sotien : 100000,
-            ngaydong : "20-11-2024"
-
-        },
-        {
-            stt:1,
-            mqg:"qg101",
-            tenqg:"Quy tre em hiem ngheo vuot kho",
-            tgbd:"20-10-2024",
-            tgkt:"20-10-2025",
-            mch:"12.01",
-            hoten:"Nguyen Phuc An Khang",
-            sotien : 100000,
-            ngaydong : "20-11-2024"
-
-        }
-    ]
+    const [data,setData] = useState<donate[]>([])
     const [change,setChange] = useState(false)
+    const [qg,setQg] = useState(false)
+    
+    useEffect(()=>{
+        const fetchDonate = async() => {
+            const res = await axiosInstance.post("/api/v1/donations/search",
+                {
+                    pageSize:999
+                }
+            );
+            const fetcheddata = res.data.content.map((item:any,index:any) =>{
+                return {
+                    apartmentId:item.apartmentId,
+                    campaignId:item.campaignId,
+                    donationDate:formatDate(item.donationDate),
+                    apartmentCode:item.apartment.code,
+                    campaignName:item.campaign.name,
+                    startDate:formatDate(item.campaign.startDate),
+                    endDate:formatDate(item.campaign.endDate),
+                    amount:item.amount,
+                }
+            })
+            setData(fetcheddata)
+        }
+        fetchDonate()
+    },[qg])
+
     return (
     <div className="p-2 border-2 h-[800px] border-black">
         {
             change ?
             <Chinhsua onShow={setChange} />
+            :
+            <></>
+        }
+        {
+            qg ?
+            <Quyengop onShow={setQg}/>
             :
             <></>
         }
@@ -54,9 +82,10 @@ function Table() {
                 </div>
             </div>
             <div className="mr-5">
-                    <button className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
-                    >QUYÊN GÓP</button>
-                </div>
+                <button className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
+                onClick={()=>setQg(true)}
+                >QUYÊN GÓP</button>
+            </div>
         </div>
         <div className="mt-2">
             <table className="w-full">
@@ -67,24 +96,24 @@ function Table() {
                         <th className="p-2 ">Thời gian bắt đầu</th>
                         <th className="p-2">Thời gian kết thúc</th>
                         <th className="p-2 w-fit">Mã căn hộ</th>
-                        <th className="p-2 w-[220px]">Họ tên chủ hộ</th>
+                        
                         <th className="p-2">Số tiền</th>
                         <th className="p-2">Ngày đóng</th>
                         <th className="p-2">Hành động</th>
                 </tr>
                 {
-                    data.map((val)=> {
+                    data.map((val,index)=> {
                         return (
                             <tr className="align-top hover:bg-[#68d3cc1c] text-center">
-                                <td className="p-2">{val.stt}</td>
-                                <td className="p-2">{val.mqg}</td>
-                                <td className="p-2">{val.tenqg}</td>
-                                <td className="p-2">{val.tgbd}</td>
-                                <td className="p-2">{val.tgkt}</td>
-                                <td className="p-2">{val.mch}</td>
-                                <td className="p-2">{val.hoten}</td>
-                                <td className="p-2">{(val.sotien).toLocaleString('de-DE')}</td>
-                                <td className="p-2">{val.ngaydong}</td>
+                                <td className="p-2">{index+1}</td>
+                                <td className="p-2">{val.campaignId}</td>
+                                <td className="p-2">{val.campaignName}</td>
+                                <td className="p-2">{val.startDate}</td>
+                                <td className="p-2">{val.endDate}</td>
+                                <td className="p-2">{val.apartmentCode}</td>
+                                
+                                <td className="p-2">{(val.amount).toLocaleString('de-DE')}</td>
+                                <td className="p-2">{val.donationDate}</td>
                                 <td className="p-2">
                                     <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white" onClick={()=>setChange(true)}>Chỉnh sửa</button>
                                 </td>

@@ -47,7 +47,6 @@ const Nhankhau:React.FC<newbox> = () => {
     const [pageSize,setPageSize] = useState(5); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
-    const maxpage = 6;
     const [add,setAdd] = useState(false);
     const [xemls,setXemls] = useState(false);
     const [chitiet,setChitiet] = useState(false);
