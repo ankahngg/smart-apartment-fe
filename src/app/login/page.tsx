@@ -32,7 +32,7 @@ export default function LoginPage() {
 
 
             // Redirect to dashboard
-            router.push('/');
+            router.push('/homepage');
         } catch (error: any) {
             handleLoginError(error);
         } finally {

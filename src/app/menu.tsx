@@ -1,9 +1,10 @@
 'use client'
 import Link from 'next/link'
-
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export default function Menu(){
+    const router = useRouter();
     const menus:{name:string,src:string}[] = [
         {
             name : 'Trang Chủ',
@@ -60,7 +61,8 @@ export default function Menu(){
     }
 
     function handleLogout() {
-        
+        localStorage.removeItem('accessToken');
+        router.push('/login');
     }
 
     return (
