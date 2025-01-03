@@ -54,3 +54,11 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+| Mục đích                          | Công cụ                           | Địa chỉ URL                                                                 |
+|-----------------------------------|-----------------------------------|-----------------------------------------------------------------------------|
+| IDE lập trình                     | IntelliJ,Visual Studio Code                          | https://www.jetbrains.com/idea/ , https://code.visualstudio.com/ |
+| Database        | MySQL         | https://www.mysql.com/  |
+| Ngôn ngữ lập trình/Framework   | Java 21   , TypeScript     , Next.js 15.0.2, Spring boot 3.0            | https://nextjs.org/ , https://www.oracle.com/java/technologies/downloads/| Oracle](https://www.oracle.com/java/technologies/javase-downloads.html) 
+| Triển khai và đóng gói | Docker | https://www.docker.com/|

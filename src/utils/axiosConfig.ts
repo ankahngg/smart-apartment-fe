@@ -25,17 +25,25 @@ axiosInstance.interceptors.request.use(
 );
 
 // Interceptor để xử lý response
+let isAlertShown = false; // Biến cờ để kiểm soát việc hiển thị alert
+
 axiosInstance.interceptors.response.use(
     (response) => {
-        // Xử lý dữ liệu từ response
+        // Reset cờ khi nhận được phản hồi thành công
+        isAlertShown = false;
         return response.data;
     },
     (error) => {
-        if (error.response.status === 401) {
-            localStorage.removeItem('accessToken');
-            window.location.href = '/login';
+        if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+            if (!isAlertShown) {
+                isAlertShown = true; // Đặt cờ để không hiển thị alert lần nữa
+                alert('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!');
+                localStorage.removeItem('accessToken');
+                window.location.href = '/login';
+            }
+        } else {
+            console.error('API Error:', error.response || error.message);
         }
-        console.error('API Error:', error.response || error.message);
         return Promise.reject(error);
     }
 );
