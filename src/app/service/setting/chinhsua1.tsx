@@ -1,5 +1,5 @@
 import axiosInstance from "@/utils/axiosConfig";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
@@ -21,6 +21,22 @@ interface fee {
 const Chinhsua1:React.FC<newbox> = ({onShow,fee}) => {
     const [dvufee,setDvufee] = useState(0);
     const [qlyfee,setQlyfee] = useState(0);
+    useEffect(() => {
+        const fetchfee = async () =>{
+            const res = await axiosInstance.post("/api/v1/fee-types/search",
+                {
+                    pageSize:999,   
+                }
+            )
+            console.log('fee service',res)
+            for ( const item of res.data.content) {
+                if(item.category.enumName=="SERVICE_FEE") setDvufee(item.unitPrice)
+                else setQlyfee(item.unitPrice)
+            }
+        }
+        fetchfee()
+    },[])
+
     async function handleChange() {
         if(!dvufee || !qlyfee ){ alert("Các khoản phí phải khác 0"); return;}
         for (const item of fee) {

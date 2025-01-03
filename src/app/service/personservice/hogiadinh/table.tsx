@@ -122,36 +122,40 @@ function Table() {
         </div>
         <div className="mt-2">
             <table className="w-full">
-                <tr className="border-b-2 border-black mb-2 text-center">
-                    <th className="p-2 w-fit">STT</th>
-                    <th className="p-2 w-fit">Mã căn hộ</th>
-                    <th className="p-2 w-[200px]">Họ tên chủ hộ</th>
-                    <th className="p-2">Diện tích</th>
-                    <th className="p-2">Số nhân khẩu</th>
-                    <th className="p-2">Số phương tiện</th>
-                    <th className="p-2">Hành động</th>
-                        
-                </tr>
-                {
-                data.map((val)=> {
-                    //const [more, setMore] = useState(false);
-                    return (
-                        <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
-                            <td className="p-2">{val.stt}</td>
-                            <td className="p-2">{val.mach}</td>
-                            <td className="p-2 w-[200px]">{val.hoten}</td>
-                            <td className="p-2">{val.dientich}</td>
-                            <td className="p-2">{val.soluong}</td>
-                            <td className="p-2">{val.phuongtien}</td>
-                            <td className="p-2">
-                                <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white "
-                                onClick={()=>{dispatch(globalSlice.actions.set_cr_apart(val)),setChitiet(true)}}
-                                >Xem chi tiết</button>
-                            </td>
-                        </tr>
-                    )
-                })
-                }
+                <thead>
+                    <tr className="border-b-2 border-black mb-2 text-center">
+                        <th className="p-2 w-fit">STT</th>
+                        <th className="p-2 w-fit">Mã căn hộ</th>
+                        <th className="p-2 w-[200px]">Họ tên chủ hộ</th>
+                        <th className="p-2">Diện tích</th>
+                        <th className="p-2">Số nhân khẩu</th>
+                        <th className="p-2">Số phương tiện</th>
+                        <th className="p-2">Hành động</th>
+                            
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                    data.map((val)=> {
+                        //const [more, setMore] = useState(false);
+                        return (
+                            <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
+                                <td className="p-2">{val.stt}</td>
+                                <td className="p-2">{val.mach}</td>
+                                <td className="p-2 w-[200px]">{val.hoten}</td>
+                                <td className="p-2">{val.dientich}</td>
+                                <td className="p-2">{val.soluong}</td>
+                                <td className="p-2">{val.phuongtien}</td>
+                                <td className="p-2">
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white "
+                                    onClick={()=>{dispatch(globalSlice.actions.set_cr_apart(val)),setChitiet(true)}}
+                                    >Xem chi tiết</button>
+                                </td>
+                            </tr>
+                        )
+                    })
+                    }
+                </tbody>
             </table>
         </div>
 

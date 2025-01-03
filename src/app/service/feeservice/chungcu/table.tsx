@@ -6,6 +6,12 @@ import { Pagination } from "antd";
 import type { PaginationProps } from "antd";
 import Chitiet from "./chitiet";
 import { useAppSelector } from "@/redux/hooks";
+import Nhaptien from "./nhaptien";
+
+
+const getFormattedDate = (str:string): string => {
+    return str+"-01T00:00:00.000Z"
+  };
 
 interface Invoice {
     id:number,
@@ -30,6 +36,7 @@ interface fee {
 const Table: React.FC = () => {
     const dongtien = useAppSelector((state) => state.global.dongtien)
     const chinhsua_fee = useAppSelector((state) => state.global.chinhsua_fee)
+    const filter_dot = useAppSelector((state) =>state.global.filter_dot)
     const filter_status = useAppSelector((state) =>state.global.filter_status)
     const filter_apart = useAppSelector((state) => state.global.filter_apart)
     const filter_floor = useAppSelector((state) => state.global.filter_floor)
@@ -38,9 +45,11 @@ const Table: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<Error | null>(null);
     const [moreid,setMoreid] = useState(-1)
+    const [nhap,setNhap] = useState(false)
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [pageSize] = useState(10); // Số item mỗi trang
+    const [total,setTotal] = useState(0)
     const dispatch = useDispatch();
 
     const formatDate = (dateString: string): string => {
@@ -87,7 +96,21 @@ const Table: React.FC = () => {
                         operation: "in",
                     })
                 }
-                console.log(filter_status,filter_status==='CHUA_THANH_TOAN')
+                if(filter_dot != '') {
+                    var sd = filter_dot+"-01T00:00:00.000Z"
+                    var ed = filter_dot+"-28T00:00:00.000Z"
+                    filters.push({
+                        name: "startDate",
+                        value: sd,
+                        operation: "gt",
+                    })
+                    filters.push({
+                        name: "startDate",
+                        value: ed,
+                        operation: "lt",
+                    })
+
+                }
                 if(filter_status != '') {
                     filters.push({
                         name: "status",
@@ -107,6 +130,9 @@ const Table: React.FC = () => {
                     const fetchedData = response.data.content.map((item: any, index: number) => {
                         var d:string = item.lastPayDate?.split("T")[0] || "Chưa đóng";
                         if(d != "Chưa đóng") d = d.split('-').reverse().join('-')
+                        var tong=0;
+                        tong += item.totalAmount+item.waterFee.feeAmount+item.electricityFee.feeAmount+item.internetFee.feeAmount;
+                        console.log("tien",tong)
                        return {
                             stt: index + 1 + (page - 1) * pageSize,
                             id: item.id,
@@ -114,7 +140,7 @@ const Table: React.FC = () => {
                             mch: item.apartment?.code || "N/A",
                             hoten: item.apartment?.owner?.fullName || "N/A",
                             dotthu: formatDate(item.startDate),
-                            tongtien : item.totalAmount,
+                            tongtien : parseInt(tong.toFixed(0)),
                             state: item.status ,
                             ngaydong: d,
                             note:item.note,
@@ -135,7 +161,7 @@ const Table: React.FC = () => {
         };
 
         fetchInvoices(currentPage); // Gọi hàm fetchInvoices mỗi khi `currentPage` thay đổi
-    }, [currentPage, pageSize,filter_apart,filter_floor,chinhsua_fee,dongtien,filter_status]); // Các dependency bao gồm `currentPage` và `pageSize`
+    }, [currentPage, pageSize,filter_apart,filter_floor,chinhsua_fee,dongtien,filter_status,nhap,filter_dot]); // Các dependency bao gồm `currentPage` và `pageSize`
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
         setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -159,19 +185,32 @@ const Table: React.FC = () => {
                     <div className="mr-5">
                         <button
                             className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
+                            onClick={() => setNhap(true)}
+                        >
+                            NHẬP TIỀN SINH HOẠT
+                        </button>
+                    </div>
+                    <div className="mr-5">
+                        <button
+                            className="border-2 p-2 bg-[#1e83a5] hover:bg-[#176b87] rounded-xl text-white"
                             onClick={() => dispatch(globalSlice.actions.dongtien(true))}
                         >
                             TẠO HÓA ĐƠN
                         </button>
                     </div>
+                    
                 </div>
             </div>
+            {
+                nhap?<Nhaptien onShow={setNhap}/>:<></>
+            }
             <div className="mt-2 h-[600px]">
                 {
                     moreid>0 ? <Chitiet onShow={setMoreid} id={moreid}/>
                     :<></>
                 }
                 <table className="w-full">
+                    <thead>
                         <tr className="border-b-2 border-black text-center">
                             <th className="p-2">MHD</th>
                             <th className="p-2">Mã căn hộ</th>
@@ -183,6 +222,9 @@ const Table: React.FC = () => {
                             <th className="p-2 w-[180px]">Ghi chú</th>
                             <th className="p-2">Hành động</th>
                         </tr>
+                    </thead>
+                    <tbody>
+
                         {
                             data.length > 0 ? (
                                 data.map((val) => {
@@ -227,7 +269,7 @@ const Table: React.FC = () => {
                                     </td>
                                 </tr>
                             )}
-
+                    </tbody>
                 </table>
                 <div className="flex justify-between items-center mt-4">
                     <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} hóa đơn</div>

@@ -58,11 +58,27 @@ function Table() {
                 value: filter_apart,
                 operation: "eq",
             })
-            // if(filter_floor != '') filters.push({
-            //     name: "apartmentId",
-            //     value: filter_apart,
-            //     operation: "eq",
-            // })
+            if(filter_floor != '' && filter_apart =='' ) {
+                const res = await axiosInstance.post("/api/v1/apartments/search",{
+                    pageSize:999,
+                    filters:[
+                        {
+                            name:"floorId",
+                            value:filter_floor,
+                            operation:"eq",
+                        }
+                    ]
+                })
+                var apartids:number[] = []
+                for (const item of res.data.content) {
+                    apartids.push(item.apartmentId)
+                }
+                filters.push({
+                    name: "apartmentId",
+                    value: apartids,
+                    operation: "in",
+                })
+            }
             if(filter_campaigns.length == 1 && filter_campaigns[0]==-1) filters;
             else 
                 filters.push({

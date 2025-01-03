@@ -15,6 +15,7 @@ interface StateType {
     filter_campaigns:number[],
     cr_invoice:Invoice,
     filter_status:string,
+    filter_dot:string,
 }
 
 
@@ -64,7 +65,8 @@ const initState : StateType = {
     filter_apart:'',
     filter_keyword:'',
     filter_campaigns:[-1],
-    filter_status:''
+    filter_status:'',
+    filter_dot:''
 }
 
 interface Invoice {
@@ -148,6 +150,9 @@ export default createSlice({
         },
         set_filter_status:(state,action : PayloadAction<string>) =>{
             state.filter_status = action.payload;
+        },
+        set_filter_dot:(state,action : PayloadAction<string>) =>{
+            state.filter_dot = action.payload;
         },
     }
 })

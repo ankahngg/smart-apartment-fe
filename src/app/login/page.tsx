@@ -3,6 +3,7 @@
 import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosConfig"
+import Image from 'next/image'
 
 export default function LoginPage() {
     const [username, setUsername] = useState<string>('');
@@ -30,7 +31,6 @@ export default function LoginPage() {
                 localStorage.setItem('accessToken', data);
             }
 
-
             // Redirect to dashboard
             router.push('/homepage');
         } catch (error: any) {
@@ -55,6 +55,15 @@ export default function LoginPage() {
         <div className="flex justify-center border-2 h-screen bg-[#c5f6f1]">
             <title>LOGIN</title>
             <div className="bg-[#6fd0c9] w-[32rem] h-fit border-2 mt-40 flex flex-col rounded-xl p-6 space-y-6 ">
+                <div className="flex justify-center">
+                    <Image
+                        src="/logo.png"
+                        width={100}
+                        height={100}
+                        alt="logo"
+                    />
+
+                </div>
                 {/* <p>anh</p> */}
                 <input type="text" onChange={(e) => setUsername(e.target.value)} value={username} placeholder="Tên đăng nhập" className="bg-[#e1fffc] p-4 rounded-xl text-[#6fd0c9] text-xl" />
                 <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} placeholder="Mật khẩu" className="bg-[#e1fffc] p-4 rounded-xl text-[#6fd0c9] text-xl" />

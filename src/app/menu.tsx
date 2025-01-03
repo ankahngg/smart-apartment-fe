@@ -26,8 +26,9 @@ export default function Menu(){
     
     const [service,setService] = useState(false)
     function ServiceDrop() {
+        console.log("lol")
         return (
-            <div className='absolute w-[120px] top-[55px]'>
+            <div className='absolute z-10 w-[120px] border-black left-1/2 translate-y-1/2 top-[-4px]'>
                 <div className='hover:bg-[#64ccc5] bg-[#176b87] p-1 '
                 onClick={()=>setService(!service)}
                 >
@@ -80,36 +81,33 @@ export default function Menu(){
                 </div>
 
             </div>
+            <div className='relative'>
+                {
+                    service ?
+                    <ServiceDrop />
+                    :
+                    <></>
+                }
+            </div>
             <div className='flex justify-center bg-[#176b87] '>
                 {
                     menus.map((item,index)=>{
                         if(item.name == "Dịch Vụ") {
                             return (
-                                <div className='flex items-center p-2 relative'> 
+                                <div className='flex items-center p-2 relative' key={index}> 
                                     <button className='text-white hover:bg-[#64ccc5] p-2 '
                                     // onMouseLeave={()=>setService(false)}
                                     onClick={()=>setService(!service)}
 
                                     >Dịch Vụ</button>
-                                    {/* <Link
-                                    key={item.name}
-                                    href={item.src}
-                                    className="text-white hover:bg-[#64ccc5] p-2 "
-                                    >
-                                    {item.name}
-                                    </Link> */}
-                                    {
-                                        service ?
-                                        <ServiceDrop />
-                                        :
-                                        <></>
-                                    }
+                                   
+                                    
                                 </div>
                             );
                         }
                         else {
                             return (
-                                <div className='flex items-center p-2'> 
+                                <div className='flex items-center p-2' key={index}> 
                                     <Link
                                     key={item.name}
                                     href={item.src}

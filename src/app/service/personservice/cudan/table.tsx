@@ -46,16 +46,33 @@ function Table() {
                 operation:"eq",
                 value:filter_apart
             })
-            if(filter_floor != '') filters.push({
-                name:"floorId",
-                operation:"eq",
-                value:filter_floor
-            })
+            if(filter_floor != '' && filter_apart =='' ) {
+                const res = await axiosInstance.post("/api/v1/apartments/search",{
+                    pageSize:999,
+                    filters:[
+                        {
+                            name:"floorId",
+                            value:filter_floor,
+                            operation:"eq",
+                        }
+                    ]
+                })
+                var apartids:number[] = []
+                for (const item of res.data.content) {
+                    apartids.push(item.apartmentId)
+                }
+                filters.push({
+                    name: "apartmentId",
+                    value: apartids,
+                    operation: "in",
+                })
+            }
             
             const res = await axiosInstance.post("/api/v1/residents/search",{
                 page:page-1,
                 pageSize,
                 filters:filters,
+                keyword:filter_keyword,
             })
             console.log("resi api :",res);
 
@@ -104,7 +121,7 @@ function Table() {
             setData(fetchedData)
         }
         fetchResi(currentPage)
-    },[currentPage,pageSize,filter_apart,filter_floor,chitiet])
+    },[currentPage,pageSize,filter_apart,filter_floor,chitiet,filter_keyword])
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
                 setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -131,34 +148,39 @@ function Table() {
 
         <div className="mt-2 h-[500px]">
             <table className="w-full">
-                <tr className="border-b-2 border-black mb-2 text-center">
-                        <th className="p-2 w-fit">STT</th>
-                        <th className="p-2 w-fit">Họ tên</th>
-                        <th className="p-2 w-[200px]">Căn hộ</th>
-                        <th className="p-2">Ngày sinh</th>
-                        <th className="p-2">Giới tính</th>
-                        <th className="p-2">Liên hệ</th>
-                        <th className="p-2">Trạng thái</th>
-                        <th className="p-2">Hành động</th>
-                </tr>
-                {
-                    data.map((val,index)=> {
-                        return (
-                            <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
-                                <td className="p-2">{val.stt}</td>
-                                <td className="p-2 w-[200px]">{val.hoten}</td>
-                                <td className="p-2">Căn hộ {val.tench}</td>
-                                <td className="p-2">{val.ngaysinh}</td>
-                                <td className="p-2">{val.gioitinh}</td>
-                                <td className="p-2">{val.lienhe}</td>
-                                <td className="p-2">{val.trangthai}</td>
-                                <td className="p-2">
-                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white " onClick={()=>{dispatch(globalSlice.actions.set_cr_res(val)),setChitiet(true)}}>XEM CHI TIẾT</button>
-                                </td>
-                            </tr>
-                        )
-                    })
-                }
+                <thead>
+                    <tr className="border-b-2 border-black mb-2 text-center">
+                            <th className="p-2 w-fit">STT</th>
+                            <th className="p-2 w-fit">Họ tên</th>
+                            <th className="p-2 w-[200px]">Căn hộ</th>
+                            <th className="p-2">Ngày sinh</th>
+                            <th className="p-2">Giới tính</th>
+                            <th className="p-2">Liên hệ</th>
+                            <th className="p-2">Trạng thái</th>
+                            <th className="p-2">Hành động</th>
+                    </tr>
+
+                </thead>
+                <tbody>
+                    {
+                        data.map((val,index)=> {
+                            return (
+                                <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
+                                    <td className="p-2">{val.stt}</td>
+                                    <td className="p-2 w-[200px]">{val.hoten}</td>
+                                    <td className="p-2">{val.tench||"Không có"}</td>
+                                    <td className="p-2">{val.ngaysinh}</td>
+                                    <td className="p-2">{val.gioitinh}</td>
+                                    <td className="p-2">{val.lienhe}</td>
+                                    <td className="p-2">{val.trangthai}</td>
+                                    <td className="p-2">
+                                        <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white " onClick={()=>{dispatch(globalSlice.actions.set_cr_res(val)),setChitiet(true)}}>XEM CHI TIẾT</button>
+                                    </td>
+                                </tr>
+                            )
+                        })
+                    }
+                </tbody>
             </table>
 
         </div>

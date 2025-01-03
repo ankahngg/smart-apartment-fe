@@ -19,12 +19,12 @@ function ThongBao() {
                 </div>
                 <div>
                     {
-                        list.map((item) => {
+                        list.map((item,index) => {
                             let ngay = item.Ngay;
                             var tmp = ngay.split("/");
                             
                             return (
-                                <div className="flex ">
+                                <div className="flex " key={index}>
                                     <div className="flex flex-col items-center p-5"> 
                                         <p className="text-2xl font-bold">Tháng {tmp[1]}</p>
                                         <p>{tmp[0]}</p>

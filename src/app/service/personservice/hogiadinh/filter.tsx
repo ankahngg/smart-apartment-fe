@@ -99,7 +99,7 @@ function Filter() {
                 {
                     apartdata.map((val)=>{
                         return (
-                            <option value={val.id}> TẦNG {val.code}</option>
+                            <option value={val.id}> CĂN HỘ {val.code}</option>
                         )
                     })
                 }

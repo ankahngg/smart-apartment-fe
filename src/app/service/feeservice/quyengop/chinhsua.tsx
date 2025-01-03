@@ -138,6 +138,7 @@ const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
 
     async function handleDel() {
         await axiosInstance.delete(`/api/v1/donations/${crDonate.id}`)
+        dispatch(globalSlice.actions.set_reload());
         onShow(false)
     }
 

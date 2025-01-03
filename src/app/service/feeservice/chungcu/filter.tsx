@@ -38,7 +38,7 @@ const Filter: React.FC = () => {
             ]
         })
         if (response.data && response.data.content) {
-            const fetchedData = response.data.content.map((item: any, index: number) => ({
+            const fetchedData = response.data.content.map((item: any) => ({
                 id: item.apartmentId,
                 name: item.name,
                 code: item.code,
@@ -55,10 +55,12 @@ const Filter: React.FC = () => {
             setApartid('')
             setKeyword('')
             setApartmentdata([])
+            setDate('')
             dispatch(globalSlice.actions.set_filter_apart(''))
             dispatch(globalSlice.actions.set_filter_floor(''))
             dispatch(globalSlice.actions.set_filter_keyword(''))
             dispatch(globalSlice.actions.set_filter_status(''))
+            dispatch(globalSlice.actions.set_filter_dot(''))
         }
     
         function doFilter(): void {
@@ -66,6 +68,7 @@ const Filter: React.FC = () => {
             dispatch(globalSlice.actions.set_filter_floor(floorid))
             dispatch(globalSlice.actions.set_filter_keyword(keyword))
             dispatch(globalSlice.actions.set_filter_status(state))
+            dispatch(globalSlice.actions.set_filter_dot(date))
         }
 
     useEffect(() => {
@@ -74,7 +77,7 @@ const Filter: React.FC = () => {
                 pageSize : 999,
             })
             if (response.data && response.data.content) {
-                const fetchedData = response.data.content.map((item: any, index: number) => ({
+                const fetchedData = response.data.content.map((item: any) => ({
                     
                     id: item.id,
                     name: item.name,
@@ -98,13 +101,15 @@ const Filter: React.FC = () => {
         dispatch(globalSlice.actions.set_filter_keyword(''))
 
     }, []);
-
+    const [date,setDate] = useState('')
+    // alert(date)
     return (
         <div className="flex">
             <div className="p-3 w-[250px] border-black border-2">
                 <div className="text-xl mb-3 p-2 italic">Bộ lọc</div>
-
-                {/* <MonthYearPicker setDate={setDate} /> */}
+                {/* <MonthYearPicker setDate={setDate} date={date}/> */}
+                <div className="p-2">CHỌN ĐỢT THU</div>
+                <input className="p-2 w-full border-2 border-black rounded-xl mb-2" type="month" onChange={(e)=>setDate(e.target.value)} value={date}/>
 
                 <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => setState(e.target.value)} value={state}>
                     <option value="">CHỌN TRẠNG THÁI</option>
@@ -118,9 +123,9 @@ const Filter: React.FC = () => {
                 <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => {handleFloor(e.target.value),setFloorid(e.target.value)}} value={floorid}>
                     <option value={''}>CHỌN TẦNG</option>
                         {
-                            floordata.map((val) => {
+                            floordata.map((val,index) => {
                                 return (
-                                    <option value={val.id}>Tầng {val.floorNumber}</option>
+                                    <option value={val.id} key={index}>Tầng {val.floorNumber}</option>
                                 )
                             })
                         }
@@ -129,9 +134,9 @@ const Filter: React.FC = () => {
                 <select className="p-2 w-full text-l border-black border-2 mb-2 rounded-xl" onChange={(e) => setApartid(e.target.value)} value={apartid}>
                     <option value={''}>CHỌN CĂN HỘ</option>
                     {
-                            apartmentdata.map((val) => {
+                            apartmentdata.map((val,index) => {
                                 return (
-                                    <option value={val.id}> Căn hộ {val.code}</option>
+                                    <option value={val.id} key={index}> Căn hộ {val.code}</option>
                                 )
                             })
                         }

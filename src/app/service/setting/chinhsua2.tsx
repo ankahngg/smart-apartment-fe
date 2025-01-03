@@ -1,5 +1,5 @@
 import axiosInstance from "@/utils/axiosConfig";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface newbox {
     onShow : (show : boolean) => void,
@@ -15,6 +15,20 @@ const Chinhsua2:React.FC<newbox> = ({onShow,vehifee}) => {
     const [xemayfee,setXemayfee] = useState(0);
     const [xedapfee,setXedapfee] = useState(0);
     const [otherfee,setOtherfee] = useState(0);
+
+    useEffect(() => {
+        const fetchfee = async () =>{
+            const res = await axiosInstance.get("/api/v1/vehicles/vehicle-types")
+            console.log('parking service',res)
+            for ( const item of res.data) {
+                if(item.feeCategory=="PARKING_CAR") setOtofee(item.unitPrice)
+                else if(item.feeCategory=="PARKING_MOTORCYCLE") setXemayfee(item.unitPrice);
+                else if(item.feeCategory=="PARKING_BICYCLE") setXedapfee(item.unitPrice);
+                else setOtherfee(item.unitPrice)
+            }
+        }
+        fetchfee()
+    },[])
 
     async function handleChange() {
         if(!otofee || !xedapfee || !xemayfee ||!otherfee){ alert("Các khoản phí phải khác 0"); return;}

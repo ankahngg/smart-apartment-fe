@@ -1,41 +1,78 @@
 import clsx from "clsx";
 import Phantrang from "../../phantrang";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import axiosInstance from "@/utils/axiosConfig";
 
 interface newbox {
     onShow : (show : boolean) => void
 }
+interface biendong{
+    stt : number,
+    id : number,
+    trangthai:string,
+    ngay: string,
+    ghichu: string,
+    enumName:string,
+    macd:string,
+    hoten:string,
+}
+
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(date);
+  };
+
+
 const Lichsubd:React.FC<newbox> = ({onShow}) => {
-    const lichsu_data:{macd:string,hoten:string,vaitro:string,ngaybd:string,loaibd:string}[] = [
-        {
-            macd : 'CD101',
-            hoten : "Nguyen Phuc An Khang",
-            vaitro : "Chủ hộ",
-            ngaybd : "20-10-2024",
-            loaibd : "Thêm",
-        },
-        {
-            macd : 'CD101',
-            hoten : "Nguyen Phuc An Khaggng",
-            vaitro : "Chủ hộ",
-            ngaybd : "20-10-2024",
-            loaibd : "Thêm",
-        },
-        {
-            macd : 'CD101',
-            hoten : "Nguyen Phuc An Khang",
-            vaitro : "Chủ hộ",
-            ngaybd : "20-10-2024",
-            loaibd : "Xóa",
-        },
-        {
-            macd : 'CD101',
-            hoten : "Nguyen Phuc An Khang",
-            vaitro : "Chủ hộ",
-            ngaybd : "20-10-2024",
-            loaibd : "Xóa",
+    const cr_apart = useAppSelector((state) => state.global.cr_apart) 
+    const [logdata,setLogdata] = useState<biendong[]>([])
+    useEffect(() =>{
+        const fetchChangelog = async () =>{
+            const response = await axiosInstance.post("/api/v1/residents/change-log/search",{
+                pageSize:999,
+                filters: [
+                    {
+                        name:"apartmentId",
+                        value:cr_apart.id,
+                        operation:"eq",   
+                    }
+                ],
+                sorts: [
+                    {
+                        property: "changeDate",
+                        direction: "desc"
+                    },
+                ]
+            });
+        
+            console.log('changelog Response:', response.data);
+            if(response.data) {
+                const fetchedData = response.data.content.map((item:any,index:any) =>{
+                    return {
+                        stt : index+1,
+                        trangthai:item.changeType.name,
+                        ngay:formatDate(item.changeDate),
+                        ghichu:item.notes,
+                        id : item.id,
+                        enumName : item.changeType.enumName,
+                        macd :item.resident?.residentId||"",
+                        hoten:item.resident?.fullName||"",
+                    }
+                })
+                console.log('fetchedData_changelog: ',fetchedData)
+                setLogdata(fetchedData);
+            }
+            else setLogdata([])
         }
-    ]
+        fetchChangelog()
+
+    },[])
+
     return (
         
         <div className="w-full h-full fixed z-10">
@@ -49,26 +86,21 @@ const Lichsubd:React.FC<newbox> = ({onShow}) => {
                 <div className="p-3 h-[300px] overflow-y-scroll">
                     <table className="w-full ">
                         <tr className="text-center sticky top-0 bg-white">
-                            <th className="p-2">MCD</th>
+                            <th className="p-2">STT</th>
                             <th className="p-2 w-[200px]">Họ và tên</th>
-                            <th className="p-2">Vai trò</th>
                             <th className="p-2">Ngày biến động</th>
                             <th className="p-2">Loại biến động</th>
                         </tr>
                         {
-                            lichsu_data.map((val,index)=>{
+                            logdata.map((val,index)=>{
                                 return (
-                                    <tr className="text-center">
+                                    <tr className="text-center" key={index}>
                                         <td className="p-2">{val.macd}</td>
                                         <td className="p-2">{val.hoten}</td>
-                                        <td className="p-2">{val.vaitro}</td>
-                                        <td className="p-2">{val.ngaybd}</td>
-                                        <td className={clsx(
-                                            'p-2 font-bold',
-                                            {'text-red-500 ' : val.loaibd == "Xóa"},
-                                            {'text-green-500' : val.loaibd == "Thêm"},
-                                        )}
-                                        >{val.loaibd}</td>
+                                       
+                                        <td className="p-2">{val.ngay}</td>
+                                        <td className="p-2"
+                                        >{val.trangthai}</td>
                                     </tr>
                                 )
                             })

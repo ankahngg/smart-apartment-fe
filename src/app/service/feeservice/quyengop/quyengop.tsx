@@ -1,3 +1,4 @@
+import globalSlice from "@/redux/globalSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
@@ -121,8 +122,8 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
             apartmentId: chchoose,
             campaignId: qgchoose
         })
-        dispatch(globalSlice.actions.set_reload())
         onShow(false)
+        dispatch(globalSlice.actions.set_reload())
     }
 
     async function handleSearch(keyword:string) {
@@ -207,18 +208,6 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
                             </select>
                         </div>
                     </div>
-                    <div className="flex mt-2">
-                        <div className="font-bold w-[150px]">Tên chủ hộ</div>
-                        <div className=" ">
-                            {
-                                apartdata.map((item,index) => {
-                                    if(item.id == chchoose) return <>{item.name}</>
-                                    
-                                })
-                            }
-                        </div>
-                    </div>
-
                     <div className="flex mt-2 items-center">
                         <div className="font-bold w-[150px]">Số tiền</div>
                         <div>

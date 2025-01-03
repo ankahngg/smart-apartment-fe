@@ -33,9 +33,9 @@ function Footer() {
                 <p className="text-white mt-5 mb-5">BAN QUẢN LÍ CHUNG CƯ CAO CẤP BLUEMOON</p>
                 <div>
                     {
-                        thongtin.map((item) => {
+                        thongtin.map((item,index) => {
                             return (
-                                <div className="flex p-2 items-center">
+                                <div className="flex p-2 items-center" key={index}>
                                     <Image 
                                         src={item.icon}
                                         width={50}

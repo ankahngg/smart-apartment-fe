@@ -68,7 +68,7 @@ function Chinhsua() {
                                     {
                                         stateData.map((item,index) => {
                                             return (
-                                                <option value={item.enumName}>
+                                                <option value={item.enumName} key={index}>
                                                     {item.name}
                                                 </option>
                                             )

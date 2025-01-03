@@ -166,17 +166,22 @@ const Nhankhau:React.FC<newbox> = () => {
             </div>
             <div className="h-[300px] overflow-y-scroll">
                 <table className="w-full">
-                    <tr className="border-b-2 border-black mb-2 text-center bg-white ">
-                        <th>STT</th>
-                        <th className="p-2 w-[200px]">Họ và tên</th>
-                        <th className="p-2">Giới tính</th>
-                        <th className="p-2">Ngày sinh</th>
-                        <th className="p-2">Mã số CCCD</th>
-                        <th className="p-2">Liên hệ</th>
-                        <th className="p-2">Trạng thái</th>
-                        <th className="p-2">Vai trò</th>
-                        <th className="p-2">Hành động</th>
-                    </tr>
+                    <thead>
+                        <tr className="border-b-2 border-black mb-2 text-center bg-white ">
+                            <th>STT</th>
+                            <th className="p-2 w-[200px]">Họ và tên</th>
+                            <th className="p-2">Giới tính</th>
+                            <th className="p-2">Ngày sinh</th>
+                            <th className="p-2">Mã số CCCD</th>
+                            <th className="p-2">Liên hệ</th>
+                            <th className="p-2">Trạng thái</th>
+                            <th className="p-2">Vai trò</th>
+                            <th className="p-2">Hành động</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+
                         {
                             data.map((val,index)=> {
                                 return (
@@ -205,6 +210,7 @@ const Nhankhau:React.FC<newbox> = () => {
                                 )
                             })
                         }
+                    </tbody>
                 </table>
             </div>
             <div className="flex justify-between items-center mt-4">
