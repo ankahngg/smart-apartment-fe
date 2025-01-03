@@ -26,6 +26,8 @@ interface nhankhau {
     trangthai:string,
     lienhe : string,
     vaitro : string,
+    mach:string,
+    tench:string,
 }
 
 const formatDate = (dateString: string): string => {
@@ -108,6 +110,8 @@ const Nhankhau:React.FC<newbox> = () => {
                         lienhe : item.contact||"",
                         vaitro : item.householdRole.name||"",
                         trangthai:tt,
+                        mach:item.apartmentId,
+                        tench:item.apartment?.name
                     });
                 }
                 fetchedData.sort(function(a:nhankhau,b:nhankhau){return (b.vaitro=="Chủ hộ"?1:0)-(a.vaitro=="Chủ hộ"?1:0)})
@@ -204,7 +208,7 @@ const Nhankhau:React.FC<newbox> = () => {
                 </table>
             </div>
             <div className="flex justify-between items-center mt-4">
-                <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} căn hộ</div>
+                <div className="pt-2">Hiển thị {startItem} - {endItem} / {totalItems} cư dân</div>
     
                 <Pagination
                     current={currentPage}

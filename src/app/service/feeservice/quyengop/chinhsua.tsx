@@ -1,5 +1,7 @@
+import globalSlice from "@/redux/globalSlice";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 interface newbox {
     onShow : (show : boolean) => void,
@@ -51,6 +53,7 @@ interface Canho{
 
 
 const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
+    const dispatch = useDispatch()
     const [data, setData] = useState<Chiendich[]>([]);
     const [apartdata,setApartdata] = useState<Canho[]>([])
     const [state,setState] = useState('all')
@@ -129,6 +132,7 @@ const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
             apartmentId: chchoose,
             campaignId: qgchoose
         })
+        dispatch(globalSlice.actions.set_reload());
         onShow(false)
     }
 
@@ -136,8 +140,6 @@ const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
         await axiosInstance.delete(`/api/v1/donations/${crDonate.id}`)
         onShow(false)
     }
-
-    
 
     return (
         
@@ -150,6 +152,10 @@ const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
                 </div>
                 <div className="p-2">
                     <div className="text-center font-bold text-xl">QUYÊN GÓP</div>
+                    <div className="flex mt-2 items-center">
+                        <div className="font-bold w-[150px]">Mã căn hộ</div>
+                        <div>{crDonate.apartmentCode}</div>
+                    </div>
                     <div className="flex items-center mt-5">
                         <div className="font-bold   w-[150px]">Lọc quyên góp</div>
                         <div className="">
@@ -195,23 +201,6 @@ const Chinhsua:React.FC<newbox> = ({onShow,crDonate}) => {
                                 )
                             })
                         }
-                    </div>
-
-                    <div className="flex mt-2 items-center">
-                        <div className="font-bold w-[150px]">Mã căn hộ</div>
-                        <div className="ml-2">
-                            <select className="border-2 border-black p-2 rounded-xl w-[100px]" onChange={(e)=>setChchoose(parseInt(e.target.value))} value={chchoose}>
-                                {
-                                    apartdata.map((val,index) => {
-                                        return (
-                                            <option value={val.id}>
-                                            {val.mach}
-                                            </option>
-                                        )
-                                    })
-                                }
-                            </select>
-                        </div>
                     </div>
                     <div className="flex mt-2">
                         <div className="font-bold w-[150px]">Tên chủ hộ</div>

@@ -5,25 +5,32 @@ import { Pagination } from "antd";
 import type { PaginationProps } from "antd";
 import axiosInstance from "@/utils/axiosConfig";
 import { useAppSelector } from "@/redux/hooks";
+import globalSlice from "@/redux/globalSlice";
+import Xemchitiet from "../hogiadinh/nhankhau/xemchitiet";
 
-interface cudan {
-    stt:number,
-    resdientId:number,
-    fullName : string,
-    dateOfBirth: string,
-    gender:string,
-    contact:string,
-    livingType:string,
-    apartmentId:number
-    apartment:string,
+
+interface nhankhau {
+    stt : number,
+    macd : string,
+    hoten :string,
+    gioitinh : string,
+    ngaysinh : string,
+    cccd : string,
+    quequan : string,
+    nghenghiep : string,
+    trangthai:string,
+    lienhe : string,
+    vaitro : string,
+    mach:string,
+    tench:string,
 }
 
 function Table() {
     const filter_apart = useAppSelector((state) => state.global.filter_apart)
     const filter_floor = useAppSelector((state) => state.global.filter_floor)
     const filter_keyword = useAppSelector((state) => state.global.filter_keyword)
-        
-    const [data,setData] = useState<cudan[]>([])
+    const [chitiet,setChitiet] = useState(false);
+    const [data,setData] = useState<nhankhau[]>([])
     const [pageSize,setPageSize] = useState(10); // Số item mỗi trang
     const [currentPage, setCurrentPage] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
@@ -49,28 +56,55 @@ function Table() {
                 page:page-1,
                 pageSize,
                 filters:filters,
-                
             })
             console.log("resi api :",res);
-            const fetcheddata = res.data.content.map((item:any,index:any) =>{
-                return {
-                    stt : (page-1)*pageSize+1+index,
-                    resdientId:item.residentId,
-                    fullName : item.fullName,
-                    dateOfBirth: item.dateOfBirth? item.dateOfBirth.split('-').reverse().join('/'):"",
-                    gender:item.gender.name||"",
-                    contact:item.contact||"",
-                    livingType:item.currentLivingType.name,
-                    apartmentId:item.apartmentId||"",
-                    apartment:item.apartment?.code
+
+            var fetchedData:nhankhau[] = []
+            for (const [index, item] of res.data.content.entries()) {
+                const res = await axiosInstance.post("/api/v1/residents/change-log/search", {
+                    pageSize: 999,
+                    filters: [
+                        {
+                            name: "residentId",
+                            value: item.residentId,
+                            operation: "eq",
+                        },
+                    ],
+                    sorts: [
+                        {
+                            property: "changeDate",
+                            direction: "desc"
+                        },
+                    ]
+                });
+                var tt = ''
+                if(res.data.content.length == 0) tt = 'Thường trú'
+                else {
+                    tt = res.data.content[0].changeType.name
                 }
-            })
-            console.log("fetched data  :",fetcheddata);
+                fetchedData.push ({
+                    stt : (page-1)*pageSize+index+1,
+                    macd : item.residentId,
+                    hoten :item.fullName,
+                    gioitinh : item.gender.name||"",
+                    ngaysinh : item.dateOfBirth.split('-').reverse().join('/'),
+                    cccd : item.identityCardNumber||"",
+                    quequan : item.hometown||"",
+                    nghenghiep : item.job||"",
+                    lienhe : item.contact||"",
+                    vaitro : item.householdRole.name||"",
+                    trangthai:tt,
+                    mach:item.apartmentId,
+                    tench:item.apartment?.code
+                });
+            }
+
+            console.log("fetched data  :",fetchedData);
             setTotalItems(res.data.totalElements); // Cập nhật state `totalItems`
-            setData(fetcheddata)
+            setData(fetchedData)
         }
         fetchResi(currentPage)
-    },[currentPage,pageSize,filter_apart,filter_floor])
+    },[currentPage,pageSize,filter_apart,filter_floor,chitiet])
 
     const handlePageChange: PaginationProps["onChange"] = (page: any) => {
                 setCurrentPage(page); // Cập nhật state `currentPage` khi trang thay đổi
@@ -86,19 +120,14 @@ function Table() {
         <div className="flex justify-between">
             <div>
                 <div className="text-xl font-bold">Danh sách cư dân</div>
-                <div className="pt-2">
-                    <div className="flex space-x-2">
-                        <div className="text-sm">Hiển thị</div>
-                        <select className="border-gray-200 boder-2 bg-gray-200 text-sm">
-                            <option>10</option>
-                            <option>11</option>
-                        </select>
-                        <div className="text-sm">hàng</div>
-                    </div>
-                </div>
             </div>
         </div>
-
+        {
+            chitiet?
+            <Xemchitiet onShow={setChitiet}/>
+            :
+            <></>
+        }
 
         <div className="mt-2 h-[500px]">
             <table className="w-full">
@@ -117,14 +146,14 @@ function Table() {
                         return (
                             <tr className="align-top hover:bg-[#68d3cc1c] text-center ">
                                 <td className="p-2">{val.stt}</td>
-                                <td className="p-2 w-[200px]">{val.fullName}</td>
-                                <td className="p-2">{val.apartment}</td>
-                                <td className="p-2">{val.dateOfBirth}</td>
-                                <td className="p-2">{val.gender}</td>
-                                <td className="p-2">{val.contact}</td>
-                                <td className="p-2">{val.livingType}</td>
+                                <td className="p-2 w-[200px]">{val.hoten}</td>
+                                <td className="p-2">Căn hộ {val.tench}</td>
+                                <td className="p-2">{val.ngaysinh}</td>
+                                <td className="p-2">{val.gioitinh}</td>
+                                <td className="p-2">{val.lienhe}</td>
+                                <td className="p-2">{val.trangthai}</td>
                                 <td className="p-2">
-                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white ">XEM CHI TIẾT</button>
+                                    <button className="bg-[#1e83a5] hover:bg-[#176b87] pl-2 pr-2 rounded-xl text-white " onClick={()=>{dispatch(globalSlice.actions.set_cr_res(val)),setChitiet(true)}}>XEM CHI TIẾT</button>
                                 </td>
                             </tr>
                         )

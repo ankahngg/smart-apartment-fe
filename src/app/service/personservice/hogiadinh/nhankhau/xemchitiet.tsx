@@ -113,7 +113,7 @@ const Xemchitiet:React.FC<newbox> = ({onShow}) =>{
                 gioitinh : item.gender.name||"",
                 ngaysinh : item.dateOfBirth.split('-').reverse().join('/')||"",
                 cccd : item.identityCardNumber||"",
-                quequan : item.homeTown||"",
+                quequan : item.hometown||"",
                 nghenghiep : item.job||"",
                 lienhe : item.contact||"",
                 trangthai : tt,
@@ -176,7 +176,7 @@ const Xemchitiet:React.FC<newbox> = ({onShow}) =>{
                                 <div className="font-bold mr-2">Giới tính</div>
                                 <div>{data.gioitinh}</div>
                             </div>
-                            <div className="flex w-[150px]">
+                            <div className="flex w-[200px]">
                                 <div className="font-bold mr-2">Quê quán</div>
                                 <div>{data.quequan}</div>
                             </div>

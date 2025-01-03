@@ -40,6 +40,13 @@ function Table() {
     
     useEffect(()=>{
         const fetchDonate = async() => {
+            // const response = await axiosInstance.post("/api/v1/campaigns/search", {
+            // pageSize : 999,
+            // filters : (state=='all'? all_filters: state=='open'?open_filters:close_filters),
+            // sorts: [
+            //     { property: "createdAt", direction: "desc" }]
+            // });
+
             var filters:{
                 name: string,
                 value: any,
@@ -56,11 +63,13 @@ function Table() {
             //     value: filter_apart,
             //     operation: "eq",
             // })
-            filters.push({
-                name: "campaignId",
-                value: filter_campaigns,
-                operation: "in",
-            })
+            if(filter_campaigns.length == 1 && filter_campaigns[0]==-1) filters;
+            else 
+                filters.push({
+                    name: "campaignId",
+                    value: filter_campaigns,
+                    operation: "in",
+                })
 
             const res = await axiosInstance.post("/api/v1/donations/search",
                 {
@@ -84,7 +93,6 @@ function Table() {
             setData(fetcheddata)
         }
         fetchDonate()
-        dispatch(globalSlice.actions.set_reload())
         
 
     },[qg,change,filter_apart,filter_floor,filter_keyword,filter_campaigns])

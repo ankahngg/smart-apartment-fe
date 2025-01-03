@@ -43,7 +43,9 @@ const initState : StateType = {
         nghenghiep : '',
         lienhe : '',
         trangthai : '',
-        vaitro : ''
+        vaitro : '',
+        mach:'',
+        tench:'',
     },
     cr_invoice :{
         id:0,
@@ -61,7 +63,7 @@ const initState : StateType = {
     filter_floor:'',
     filter_apart:'',
     filter_keyword:'',
-    filter_campaigns:[],
+    filter_campaigns:[-1],
     filter_status:''
 }
 
@@ -90,6 +92,8 @@ interface Canho{
 
 interface Cudan {
     stt : number,
+    tench:string,
+    mach : string,
     macd : string,
     hoten :string,
     gioitinh : string,

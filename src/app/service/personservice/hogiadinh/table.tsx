@@ -116,14 +116,7 @@ function Table() {
             <div>
                 <div className="text-xl font-bold">Danh sách căn hộ</div>
                 <div className="pt-2">
-                    <div className="flex space-x-2">
-                        <div className="text-sm">Hiển thị</div>
-                        <select className="border-gray-200 boder-2 bg-gray-200 text-sm">
-                            <option>10</option>
-                            <option>11</option>
-                        </select>
-                        <div className="text-sm">hàng</div>
-                    </div>
+                    
                 </div>
             </div>
         </div>

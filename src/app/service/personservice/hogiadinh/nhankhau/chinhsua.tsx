@@ -59,7 +59,6 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
             const response = await axiosInstance.get("/api/v1/enum/household-role")
             console.log(response)
             setRoledata(response.data)
-            
         }
         const fetchGender = async () =>{
             const response = await axiosInstance.get("/api/v1/enum/gender")
@@ -78,7 +77,7 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
             setCccd(item.identityCardNumber||"");
             setContact(item.contact||"");
             setDob(item.dateOfBirth||"");
-            setHome(item.homeTown||"");
+            setHome(item.hometown||"");
             setRole(item.householdRole.enumName||"");
             setGender(item.gender.enumName||"")
             setJob(item.job||"");
@@ -86,6 +85,10 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
              // Update state with an empty array if no data is available
             
         };
+        // setHome(cr_res.quequan)
+        // setCccd(cr_res.cccd)
+        // setContact(cr_res.lienhe)
+        // setDob
         fetchGender()
         fetchRole()
         fetchResi()
@@ -96,7 +99,7 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
         let isnum = /^\d+$/.test(cccd);
         if(name=='' || cccd == '' || !isnum || dob=='') {setWarn(true);return;}
         
-        if(role == "OWNER") {
+        if(role == "OWNER" && cr_res.vaitro != "Chủ hộ") {
             const response = await axiosInstance.post("/api/v1/residents/search", {
                 pageSize:999,
                 filters : [
@@ -109,6 +112,29 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
             });
             for (const item of response.data.content) {
                 if(item.householdRole.enumName=="OWNER") {
+
+                    const res = await axiosInstance.post("/api/v1/residents/change-log/search", {
+                        pageSize: 999,
+                        filters: [
+                            {
+                                name: "residentId",
+                                value: item.residentId,
+                                operation: "eq",
+                            },
+                        ],
+                        sorts: [
+                            {
+                                property: "changeDate",
+                                direction: "desc"
+                            },
+                        ]
+                    });
+                    var tt = ''
+                    if(res.data.content.length == 0) tt = 'Thường trú'
+                    else {
+                        tt = res.data.content[0].changeType.name
+                    }
+
                     await axiosInstance.put(`/api/v1/residents/${item.residentId}`,
                         {
                             fullName: item.fullName,
@@ -118,7 +144,7 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
                             gender: item.gender.enumName,
                             hometown:item.hometown,
                             job :item.job,
-                            currentLivingType: "THUONG_TRU",
+                            currentLivingType: tt,
                             householdRole: "OTHER",
                     })
                     await axiosInstance.put(`/api/v1/residents/${cr_res.macd}`,
@@ -130,7 +156,7 @@ const Chinhsua:React.FC<newbox> =({onShow}) => {
                             gender: gender,
                             hometown:home,
                             job :job,
-                            currentLivingType: "THUONG_TRU",
+                            currentLivingType: cr_res.vaitro,
                             householdRole: role,
                     })
                     onShow(false)

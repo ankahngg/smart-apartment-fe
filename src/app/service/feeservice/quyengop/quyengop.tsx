@@ -1,3 +1,4 @@
+import { useAppDispatch } from "@/redux/hooks";
 import axiosInstance from "@/utils/axiosConfig";
 import { useEffect, useState } from "react";
 
@@ -40,6 +41,7 @@ interface Canho{
 
 
 const Quyengop:React.FC<newbox> = ({onShow}) => {
+    const dispatch = useAppDispatch()
     const [data, setData] = useState<Chiendich[]>([]);
     const [apartdata,setApartdata] = useState<Canho[]>([])
     const [state,setState] = useState('all')
@@ -111,6 +113,7 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
     },[state])
 
     async function handleAdd() {
+        if(amount <= 20000) {alert("Số tiền không thể nhỏ hơn 20.000 đồng");return}
         if(datechoose=='') {alert("Ngày không được để trống"); return}
         await axiosInstance.post("/api/v1/donations",{
             amount: amount,
@@ -118,6 +121,7 @@ const Quyengop:React.FC<newbox> = ({onShow}) => {
             apartmentId: chchoose,
             campaignId: qgchoose
         })
+        dispatch(globalSlice.actions.set_reload())
         onShow(false)
     }
 

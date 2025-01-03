@@ -66,7 +66,7 @@ const Table: React.FC = () => {
                     value: filter_apart,
                     operation: "eq",
                 })
-                if(filter_floor != '' ) {
+                if(filter_floor != '' && filter_apart =='' ) {
                     const res = await axiosInstance.post("/api/v1/apartments/search",{
                         pageSize:999,
                         filters:[
